@@ -8,7 +8,8 @@
   #include <string>
   #include <stdlib.h>
   #include <unordered_map>
-  #include "Funcion.cpp"
+  #include "Funcion.h"
+  #include "Variable.h"
  
   using namespace std;
 %}
@@ -165,11 +166,11 @@ elemento2:	  CTEINT
 ;
  
 %%
- 
+
 int main(void){
-  if (yyparse()==0)
-		cout << "Apropiado!\n";
-	else
-		cout << "MAAAAAL!\n";
-	return 0;
+    if (yyparse()==0)
+        cout << "Apropiado!\n";
+    else
+        cout << "MAAAAAL!\n";
+    return 0;
 }
