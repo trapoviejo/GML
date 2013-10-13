@@ -1,0 +1,4 @@
+GML
+===
+
+Proyecto compilador GameMakerLite
