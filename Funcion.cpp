@@ -1,3 +1,5 @@
+#include "Funcion.h" 
+
 Funcion::Funcion(string nombre, int tipo) {
     this->nombre = nombre;
 	this->tipo = tipo;
@@ -5,5 +7,5 @@ Funcion::Funcion(string nombre, int tipo) {
 }
 
 Funcion::~Funcion() {
-  //std::cout << "goodbye " << name << "!" << endl;
+ 
 }

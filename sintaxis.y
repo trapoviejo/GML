@@ -1,9 +1,8 @@
 %{
-    int yyparse();
-    int yylex(void);
-    void yyerror(char *s){}
-    int yywrap(void){return 1;}
- 
+    
+int yylex(void);
+    void yyerror(char *s){} 
+
   #include <iostream>
   #include <string>
   #include <stdlib.h>
@@ -12,6 +11,9 @@
   #include "Variable.h"
  
   using namespace std;
+extern string programa;
+
+
 %}
  
 %token ID CTESTRING CTEINT CTEFLOAT CTEPOS TRUE FALSE PROGRAM VARS
@@ -23,7 +25,7 @@ LEFTBRACKET RIGHTBRACKET
  
  
 %%
-programa: PROGRAM ID SEMICOLON e1 mapa e2 bloque ;
+programa: PROGRAM ID {programa="programa"; } SEMICOLON e1 mapa e2 bloque ;
 e1: variables | /*null*/ ;
 e2: funcion e2 | /*null*/ ;
 
