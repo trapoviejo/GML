@@ -2,14 +2,14 @@
 #define GML_TIPOS
 
 enum gmltipos {
-     VOID = 10000;
-     ID = 10001,
-     FLOAT = 10002,
-     POS = 10003,
-     STRING = 10004,
-     BOOLEAN = 10005,
-     ENTITY = 10006,
-     LIST = 10007
+     TIPO_VOID = 10000,
+     TIPO_ID = 10001,
+     TIPO_FLOAT = 10002,
+     TIPO_POS = 10003,
+     TIPO_STRING = 10004,
+     TIPO_BOOLEAN = 10005,
+     TIPO_ENTITY = 10006,
+     TIPO_LIST = 10007
    };
  
  #endif

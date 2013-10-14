@@ -50,7 +50,7 @@ funcion:    tipoovoid ID
             ;
             
 tipoovoid:      tipo    { $$ = $1; }
-            |   VOID    { $$ = gmltipos.VOID; }
+            |   VOID    { $$ = gmltipos.TIPO_VOID; }
             ;
             
 parametros: 	tipo ID parametros2
@@ -119,15 +119,15 @@ lista:		  LIST tiposimple
 ;
 
 tipo:       tiposimple  { $$ = $1; }
-        |   lista       { $$ = gmltipos.LIST; }
+        |   lista       { $$ = gmltipos.TIPO_LIST; }
 ;
 
-tiposimple:     INT     { $$ = gmltipos.INT; }
-            |   FLOAT   { $$ = gmltipos.FLOAT; }
-            |   POS     { $$ = gmltipos.POS; }
-            |   BOOLEAN { $$ = gmltipos.BOOLEAN; }
-            |   STRING  { $$ = gmltipos.STRING; }
-            |   ENTITY  { $$ = gmltipos.ENTITY; }
+tiposimple:     INT     { $$ = gmltipos.TIPO_INT; }
+            |   FLOAT   { $$ = gmltipos.TIPO_FLOAT; }
+            |   POS     { $$ = gmltipos.TIPO_POS; }
+            |   BOOLEAN { $$ = gmltipos.TIPO_BOOLEAN; }
+            |   STRING  { $$ = gmltipos.TIPO_STRING; }
+            |   ENTITY  { $$ = gmltipos.TIPO_ENTITY; }
 ;
 
 agregar:	  ID ADD LEFTPARENTHESIS expresion RIGHTPARENTHESIS SEMICOLON
