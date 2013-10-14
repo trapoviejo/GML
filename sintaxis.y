@@ -44,13 +44,14 @@ funcion:    tipoovoid ID
                 int tipo = $1;
                 string nomFuncion = $2;
                 Funcion nuevaFuncion(nomFuncion, tipo);
-                tablaFuncs.emplace(nomFuncion, nuevaFuncion);
+                std::pair<std::string,Funcion> par (nomFuncion, nuevaFuncion);
+                tablaFuncs.insert(par);
             }
             LEFTPARENTHESIS parametros RIGHTPARENTHESIS bloque
             ;
             
 tipoovoid:      tipo    { $$ = $1; }
-            |   VOID    { $$ = gmltipos.TIPO_VOID; }
+            |   VOID    { $$ = TIPO_VOID; }
             ;
             
 parametros: 	tipo ID parametros2
@@ -119,15 +120,15 @@ lista:		  LIST tiposimple
 ;
 
 tipo:       tiposimple  { $$ = $1; }
-        |   lista       { $$ = gmltipos.TIPO_LIST; }
+        |   lista       { $$ = TIPO_LIST; }
 ;
 
-tiposimple:     INT     { $$ = gmltipos.TIPO_INT; }
-            |   FLOAT   { $$ = gmltipos.TIPO_FLOAT; }
-            |   POS     { $$ = gmltipos.TIPO_POS; }
-            |   BOOLEAN { $$ = gmltipos.TIPO_BOOLEAN; }
-            |   STRING  { $$ = gmltipos.TIPO_STRING; }
-            |   ENTITY  { $$ = gmltipos.TIPO_ENTITY; }
+tiposimple:     INT     { $$ = TIPO_INT; }
+            |   FLOAT   { $$ = TIPO_FLOAT; }
+            |   POS     { $$ = TIPO_POS; }
+            |   BOOLEAN { $$ = TIPO_BOOLEAN; }
+            |   STRING  { $$ = TIPO_STRING; }
+            |   ENTITY  { $$ = TIPO_ENTITY; }
 ;
 
 agregar:	  ID ADD LEFTPARENTHESIS expresion RIGHTPARENTHESIS SEMICOLON
