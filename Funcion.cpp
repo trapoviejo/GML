@@ -8,7 +8,7 @@ Funcion::Funcion() {
 Funcion::Funcion(string nombre, int tipo) {
     this->nombre = nombre;
 	this->tipo = tipo;
-    std::cout << "funcion " << nombre << "! tipo" << tipo << endl;
+    //std::cout << "funcion " << nombre << "! tipo" << tipo << endl;
 }
 
 Funcion::~Funcion() {
@@ -17,7 +17,7 @@ Funcion::~Funcion() {
 
 bool Funcion::InsertaVar(Variable var) {
     
-    auto it = tablaVars.find(var.nombre);
+    unordered_map<string,Variable>::const_iterator it = tablaVars.find(var.nombre);
     if(it == tablaVars.end()){
         std::pair<std::string,Variable> par (var.nombre, var);
         tablaVars.insert(par);

@@ -1,18 +1,16 @@
 %{
-    
-int yylex(void);
-    void yyerror(char *s){} 
+    #include <iostream>
+    #include <string>
+    #include <stdlib.h>
+    #include <unordered_map>
+    #include "Funcion.h"
+    #include "Variable.h"
+    #include "gml.tipos.h"
 
-  #include <iostream>
-  #include <string>
-  #include <stdlib.h>
-  #include <unordered_map>
-  #include "Funcion.h"
-  #include "Variable.h"
-  #include "gml.tipos.h"
- 
-  using namespace std;
-  
+    using namespace std;
+
+    int yylex(void);
+    void yyerror(char const *s){} 
     extern string nomPrograma;
     extern unordered_map<string, Funcion> tablaFuncs;
     extern int tipoActual; 
@@ -52,7 +50,11 @@ variables:      VARS tipo COLON ID
                     tipoActual = $2;
                     string nomID = $4;
                     Variable nuevaVar(nomID, tipoActual);
-                    tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
+                    bool yaExistia = tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
+                    if(yaExistia){
+                        yyerror("Variable declarada dos veces.");
+                        YYERROR;
+                    }
                 }
                 listaids SEMICOLON varsotrotipo
             |   /*vacio*/
@@ -61,9 +63,11 @@ listaids:       COMMA ID
                 {
                     string nomID = $2;
                     Variable nuevaVar(nomID, tipoActual);
+                    tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
                     bool yaExistia = tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
                     if(yaExistia){
                         yyerror("Variable declarada dos veces.");
+                        YYERROR;
                     }
                 }
                 listaids
@@ -74,7 +78,11 @@ varsotrotipo:   tipo COLON ID
                     tipoActual = $1;
                     string nomID = $3;
                     Variable nuevaVar(nomID, tipoActual);
-                    tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
+                    bool yaExistia = tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
+                    if(yaExistia){
+                        yyerror("Variable declarada dos veces.");
+                        YYERROR;
+                    }
                 }
                 listaids SEMICOLON varsotrotipo
             |   /*vacio*/
