@@ -13,6 +13,7 @@ public:
   Funcion();
   Funcion(string name, int tipo);
   ~Funcion();
+  InsertaVar(Variable var);
   string nombre;
   int tipo;
 private:

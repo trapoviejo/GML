@@ -14,7 +14,8 @@ int yylex(void);
   using namespace std;
   
     extern string nomPrograma;
-    extern unordered_map<string, Funcion> tablaFuncs; 
+    extern unordered_map<string, Funcion> tablaFuncs;
+    extern int tipoActual; 
 %}
 
 %union {
@@ -36,19 +37,50 @@ LEFTBRACKET RIGHTBRACKET
  
  
 %%
-programa: PROGRAM ID { nomPrograma = $2; } SEMICOLON variables mapa e2 bloque ;
-e2: funcion e2 | /*null*/ ;
-
-funcion:    tipoovoid ID 
+programa:   PROGRAM ID
             {
-                int tipo = $1;
-                string nomFuncion = $2;
-                Funcion nuevaFuncion(nomFuncion, tipo);
-                std::pair<std::string,Funcion> par (nomFuncion, nuevaFuncion);
+                nomPrograma = $2;
+                Funcion funcionPrograma(nomPrograma, TIPO_PROGRAMA);
+                std::pair<std::string,Funcion> par (nomPrograma, funcionPrograma);
                 tablaFuncs.insert(par);
             }
-            LEFTPARENTHESIS parametros RIGHTPARENTHESIS bloque
-            ;
+            SEMICOLON variables mapa funcion bloque
+;
+
+variables:      VARS tipo COLON ID
+                {
+                    tipoActual = $2;
+                    string nomID = $4;
+                    Variable nuevaVar(nomID, tipoActual);
+                    tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
+                }
+                listaids SEMICOLON varsotrotipo
+            |   /*vacio*/
+;
+listaids:       COMMA ID
+                {
+                    string nomID = $2;
+                    Variable nuevaVar(nomID, tipoActual);
+                    tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
+                }
+                listaids
+            |   /*null*/
+;
+varsotrotipo:   tipo COLON ID listaids SEMICOLON varsotrotipo
+            |   /*vacio*/
+;
+
+funcion:        tipoovoid ID 
+                {
+                    int tipo = $1;
+                    string nomFuncion = $2;
+                    Funcion nuevaFuncion(nomFuncion, tipo);
+                    std::pair<std::string,Funcion> par (nomFuncion, nuevaFuncion);
+                    tablaFuncs.insert(par);
+                }
+                LEFTPARENTHESIS parametros RIGHTPARENTHESIS bloque funcion
+            |   /*null*/
+;
             
 tipoovoid:      tipo    { $$ = $1; }
             |   VOID    { $$ = TIPO_VOID; }
@@ -61,12 +93,6 @@ parametros: 	tipo ID parametros2
 parametros2:    COMMA parametros
             |   /*null*/
             ;
-
-variables:      VARS ID e4 COLON tipo SEMICOLON e5
-            |   /*vacio*/
-            ;
-e4: COMMA ID e4| /*null*/ ;
-e5: ID e4 COLON tipo SEMICOLON e5 | /*null*/ ;
 
 mapa: MAPSIZE expresion SEMICOLON
 

@@ -15,3 +15,9 @@ Funcion::Funcion(string nombre, int tipo) {
 Funcion::~Funcion() {
  
 }
+
+Funcion::InsertaVar(Variable var) {
+    std::pair<std::string,Variable> par (nuevaVar.nombre, nuevaVar);
+    tablaVars.insert(par);
+}
+
