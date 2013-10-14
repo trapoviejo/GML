@@ -1,5 +1,4 @@
 #include "Funcion.h"
-#include "gml.tipos.h" 
 
 Funcion::Funcion() {
     this->nombre = "";
@@ -16,8 +15,14 @@ Funcion::~Funcion() {
  
 }
 
-Funcion::InsertaVar(Variable var) {
-    std::pair<std::string,Variable> par (nuevaVar.nombre, nuevaVar);
-    tablaVars.insert(par);
+bool Funcion::InsertaVar(Variable var) {
+    
+    auto it = tablaVars.find(var.nombre);
+    if(it == tablaVars.end()){
+        std::pair<std::string,Variable> par (var.nombre, var);
+        tablaVars.insert(par);
+        return false;
+    }
+    return true;
 }
 

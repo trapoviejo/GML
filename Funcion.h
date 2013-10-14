@@ -5,6 +5,7 @@
 #include <string>
 #include <unordered_map>
 #include "Variable.h"
+#include "gml.tipos.h"
 
 using namespace std;
 
@@ -13,10 +14,9 @@ public:
   Funcion();
   Funcion(string name, int tipo);
   ~Funcion();
-  InsertaVar(Variable var);
+  bool InsertaVar(Variable var);
   string nombre;
   int tipo;
-private:
   unordered_map<string,Variable> tablaVars;
 };
 

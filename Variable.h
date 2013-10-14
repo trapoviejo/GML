@@ -3,14 +3,15 @@
 
 #include <iostream>
 #include <string>
+#include "gml.tipos.h" 
 
 using namespace std;
 
 class Variable {
 public:
+  Variable();
   Variable(string nombre, int tipo);
   ~Variable();
-private:
   string nombre;
   int tipo;
   int direccion;

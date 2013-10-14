@@ -61,12 +61,22 @@ listaids:       COMMA ID
                 {
                     string nomID = $2;
                     Variable nuevaVar(nomID, tipoActual);
-                    tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
+                    bool yaExistia = tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
+                    if(yaExistia){
+                        yyerror("Variable declarada dos veces.");
+                    }
                 }
                 listaids
             |   /*null*/
 ;
-varsotrotipo:   tipo COLON ID listaids SEMICOLON varsotrotipo
+varsotrotipo:   tipo COLON ID
+                {
+                    tipoActual = $1;
+                    string nomID = $3;
+                    Variable nuevaVar(nomID, tipoActual);
+                    tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
+                }
+                listaids SEMICOLON varsotrotipo
             |   /*vacio*/
 ;
 
@@ -224,3 +234,7 @@ elemento2:	  CTEINT
 ;
  
 %%
+
+void yyerror (char const *s){
+    cout << s << endl;
+}
