@@ -3,7 +3,7 @@
 
 enum gmltipos {
      TIPO_VOID = 10000,
-     TIPO_ID = 10001,
+     TIPO_INT = 10001,
      TIPO_FLOAT = 10002,
      TIPO_POS = 10003,
      TIPO_STRING = 10004,
@@ -15,7 +15,7 @@ enum gmltipos {
  
  /* Tokens.  */
 #define TIPO_VOID 10000
-#define TIPO_ID 10001
+#define TIPO_INT 10001
 #define TIPO_FLOAT 10002
 #define TIPO_POS 10003
 #define TIPO_STRING 10004

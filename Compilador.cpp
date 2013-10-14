@@ -23,9 +23,10 @@ int main(void){
     cout << nomPrograma << endl;
     
     Funcion estaFunc;
-    for(int i = 0; i < tablaFuncs.size(); i++){
-        estaFunc = tablaFuncs[i];
-        cout << "Funcion: " << estaFunc->nombre << ", tipo: " << estaFunc->tipo << endl;
+    for ( auto it = tablaFuncs.begin(); it != tablaFuncs.end(); ++it ){
+        string key = it->first;
+        estaFunc = tablaFuncs[key];
+        cout << "Funcion: " << estaFunc.nombre << ", tipo: " << estaFunc.tipo << endl;
     }
     return 0;
 }

@@ -10,6 +10,7 @@ using namespace std;
 
 class Funcion {
 public:
+  Funcion();
   Funcion(string name, int tipo);
   ~Funcion();
   string nombre;
