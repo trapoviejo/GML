@@ -15,7 +15,6 @@ string programa;
 
 int main(void){
 
-
     if (yyparse()==0)
         cout << "Apropiado!\n";
     else

@@ -6,5 +6,5 @@ Variable::Variable(string nombre, int tipo) {
 }
 
 Variable::~Variable() {
-  //std::cout << "goodbye " << name << "!" << endl;
+
 }
