@@ -9,18 +9,23 @@ int yylex(void);
   #include <unordered_map>
   #include "Funcion.h"
   #include "Variable.h"
+  #include "gml.tipos.h"
  
   using namespace std;
-extern string programa;
-
-
+  
+    extern string nomPrograma;
+    extern unordered_map<string, Funcion> tablaFuncs; 
 %}
 
 %union {
   int entero; 
   float flotante;
-  string id;
+  char* id;
 };
+
+%type<entero> CTEINT tipoovoid tipo tiposimple
+%type<flotante> CTEFLOAT
+%type<id> ID
 
 %token ID CTESTRING CTEINT CTEFLOAT CTEPOS TRUE FALSE PROGRAM VARS
 MAPSIZE DO WHILE IF ELSE RETURN DRAW VOID INT FLOAT POS BOOLEAN STRING 
@@ -31,19 +36,34 @@ LEFTBRACKET RIGHTBRACKET
  
  
 %%
-programa: PROGRAM ID { programa = $1; } SEMICOLON e1 mapa e2 bloque ;
-e1: variables | /*null*/ ;
+programa: PROGRAM ID { nomPrograma = $2; } SEMICOLON variables mapa e2 bloque ;
 e2: funcion e2 | /*null*/ ;
 
-funcion: e14 ID LEFTPARENTHESIS e15 RIGHTPARENTHESIS bloque ;
-e14: tipo | VOID ;
-e15: 	  tipo ID e16
-		| /*vacio*/
-;
-e16: COMMA e15 | /*null*/ ;
+funcion:    tipoovoid ID 
+            {
+                int tipo = $1;
+                string nomFuncion = $2;
+                Funcion nuevaFuncion(nomFuncion, tipo);
+                tablaFuncs.emplace(nomFuncion, nuevaFuncion);
+            }
+            LEFTPARENTHESIS parametros RIGHTPARENTHESIS bloque
+            ;
+            
+tipoovoid:      tipo    { $$ = $1; }
+            |   VOID    { $$ = gmltipos.VOID; }
+            ;
+            
+parametros: 	tipo ID parametros2
+            |   /*vacio*/
+            ;
 
+parametros2:    COMMA parametros
+            |   /*null*/
+            ;
 
-variables: VARS ID e4 COLON tipo SEMICOLON e5 ;
+variables:      VARS ID e4 COLON tipo SEMICOLON e5
+            |   /*vacio*/
+            ;
 e4: COMMA ID e4| /*null*/ ;
 e5: ID e4 COLON tipo SEMICOLON e5 | /*null*/ ;
 
@@ -97,16 +117,19 @@ regreso:	  RETURN expresion SEMICOLON
 ;
 lista:		  LIST tiposimple
 ;
-tipo: 		  tiposimple
-			| lista
+
+tipo:       tiposimple  { $$ = $1; }
+        |   lista       { $$ = gmltipos.LIST; }
 ;
-tiposimple:	  INT
-			| FLOAT
-			| POS
-			| BOOLEAN
-			| STRING
-			| ENTITY
+
+tiposimple:     INT     { $$ = gmltipos.INT; }
+            |   FLOAT   { $$ = gmltipos.FLOAT; }
+            |   POS     { $$ = gmltipos.POS; }
+            |   BOOLEAN { $$ = gmltipos.BOOLEAN; }
+            |   STRING  { $$ = gmltipos.STRING; }
+            |   ENTITY  { $$ = gmltipos.ENTITY; }
 ;
+
 agregar:	  ID ADD LEFTPARENTHESIS expresion RIGHTPARENTHESIS SEMICOLON
 ;
 remover:	  ID REM SEMICOLON

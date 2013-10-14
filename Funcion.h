@@ -12,9 +12,9 @@ class Funcion {
 public:
   Funcion(string name, int tipo);
   ~Funcion();
-private:
   string nombre;
   int tipo;
+private:
   unordered_map<string,Variable> tablaVars;
 };
 

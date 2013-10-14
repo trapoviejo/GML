@@ -4,14 +4,15 @@
 #include <unordered_map>
 #include "Funcion.h"
 #include "Variable.h"
-#include "y.tab.h"   
+#include "y.tab.h"
+#include "gml.tipos.h"
 
 int yyparse();
 
 using namespace std;
 
 unordered_map<string, Funcion> tablaFuncs; 
-string programa;
+string nomPrograma;
 
 int main(void){
 
@@ -19,6 +20,12 @@ int main(void){
         cout << "Apropiado!\n";
     else
         cout << "MAAAAAL!\n";
-    cout << programa;
+    cout << nomPrograma << endl;
+    
+    Funcion estaFunc;
+    for(int i = 0; i < tablaFuncs.size(); i++){
+        estaFunc = tablaFuncs[i];
+        cout << "Funcion: " << estaFunc->nombre << ", tipo: " << estaFunc->tipo << endl;
+    }
     return 0;
 }
