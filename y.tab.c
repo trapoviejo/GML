@@ -588,13 +588,13 @@ static const yytype_uint16 yyrline[] =
      122,   125,   126,   129,   131,   132,   132,   134,   134,   134,
      134,   134,   134,   135,   135,   135,   137,   138,   139,   141,
      142,   143,   145,   145,   146,   146,   146,   148,   150,   150,
-     152,   154,   157,   160,   161,   165,   164,   183,   184,   186,
-     188,   189,   192,   194,   197,   198,   201,   202,   203,   204,
-     205,   206,   209,   211,   213,   215,   216,   217,   218,   219,
-     220,   221,   222,   223,   226,   228,   229,   230,   233,   235,
-     236,   237,   240,   242,   243,   246,   248,   249,   250,   253,
-     254,   255,   256,   259,   260,   261,   262,   263,   264,   265,
-     266,   269,   271,   272
+     152,   154,   157,   160,   161,   165,   164,   179,   180,   182,
+     184,   185,   188,   190,   193,   194,   197,   198,   199,   200,
+     201,   202,   205,   207,   209,   211,   212,   213,   214,   215,
+     216,   217,   218,   219,   222,   224,   225,   226,   229,   231,
+     232,   233,   236,   238,   239,   242,   244,   245,   246,   249,
+     250,   251,   252,   255,   256,   257,   258,   259,   260,   261,
+     262,   265,   267,   268
 };
 #endif
 
@@ -1779,12 +1779,8 @@ yyreduce:
                         unordered_map<string,Funcion>::const_iterator it = tablaFuncs.find(nomVar);
                         if(it == tablaFuncs.end())
                         {
-                        //nada
-                        }
-                        else
-                        {
-                            yyerror("Llamaste una funcion que no existe.");
-                            YYERROR;
+                           yyerror("Llamaste una funcion que no existe.");
+                           YYERROR;
                         }
                         
 
@@ -1794,63 +1790,63 @@ yyreduce:
   case 64:
 
 /* Line 1806 of yacc.c  */
-#line 197 "sintaxis.y"
+#line 193 "sintaxis.y"
     { (yyval.entero) = (yyvsp[(1) - (1)].entero); }
     break;
 
   case 65:
 
 /* Line 1806 of yacc.c  */
-#line 198 "sintaxis.y"
+#line 194 "sintaxis.y"
     { (yyval.entero) = TIPO_LIST; }
     break;
 
   case 66:
 
 /* Line 1806 of yacc.c  */
-#line 201 "sintaxis.y"
+#line 197 "sintaxis.y"
     { (yyval.entero) = TIPO_INT; }
     break;
 
   case 67:
 
 /* Line 1806 of yacc.c  */
-#line 202 "sintaxis.y"
+#line 198 "sintaxis.y"
     { (yyval.entero) = TIPO_FLOAT; }
     break;
 
   case 68:
 
 /* Line 1806 of yacc.c  */
-#line 203 "sintaxis.y"
+#line 199 "sintaxis.y"
     { (yyval.entero) = TIPO_POS; }
     break;
 
   case 69:
 
 /* Line 1806 of yacc.c  */
-#line 204 "sintaxis.y"
+#line 200 "sintaxis.y"
     { (yyval.entero) = TIPO_BOOLEAN; }
     break;
 
   case 70:
 
 /* Line 1806 of yacc.c  */
-#line 205 "sintaxis.y"
+#line 201 "sintaxis.y"
     { (yyval.entero) = TIPO_STRING; }
     break;
 
   case 71:
 
 /* Line 1806 of yacc.c  */
-#line 206 "sintaxis.y"
+#line 202 "sintaxis.y"
     { (yyval.entero) = TIPO_ENTITY; }
     break;
 
 
 
 /* Line 1806 of yacc.c  */
-#line 1854 "y.tab.c"
+#line 1850 "y.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2081,7 +2077,7 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 275 "sintaxis.y"
+#line 271 "sintaxis.y"
 
 
 void yyerror (char const *s){

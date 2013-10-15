@@ -18,11 +18,14 @@ void sumaPuntos(float points, int x){
 }
 
 {
+
 	heroe = entity ([1,1], sprite "C:/heroe.gif", false);
-	
+	vidas = 50;
 	meta1 = [50,10];
 	meta2 = [100,50];
 	meta3 = meta1 + meta2;
+
+    sumazzzPuntos(puntos, vidas);
     	
 	if((heroe_x == meta1_x) && (heroe_y == meta1_y)){
 		sumaPuntos(1000);
@@ -32,6 +35,5 @@ void sumaPuntos(float points, int x){
 		malos:1_y = malos:1_y + 1;
 	}
 	
-	lol();
 
 }
