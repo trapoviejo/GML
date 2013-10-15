@@ -1,4 +1,7 @@
 %{
+    int yylex(void);
+    void yyerror(char const *s);
+
     #include <iostream>
     #include <string>
     #include <stdlib.h>
@@ -9,11 +12,12 @@
 
     using namespace std;
 
-    int yylex(void);
-    void yyerror(char const *s){} 
+ 
     extern string nomPrograma;
     extern unordered_map<string, Funcion> tablaFuncs;
     extern int tipoActual; 
+    extern string nomFuncion;
+    
 %}
 
 %union {
@@ -63,7 +67,6 @@ listaids:       COMMA ID
                 {
                     string nomID = $2;
                     Variable nuevaVar(nomID, tipoActual);
-                    tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
                     bool yaExistia = tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
                     if(yaExistia){
                         yyerror("Variable declarada dos veces.");
@@ -91,7 +94,7 @@ varsotrotipo:   tipo COLON ID
 funcion:        tipoovoid ID 
                 {
                     int tipo = $1;
-                    string nomFuncion = $2;
+                    nomFuncion = $2;
                     Funcion nuevaFuncion(nomFuncion, tipo);
                     std::pair<std::string,Funcion> par (nomFuncion, nuevaFuncion);
                     tablaFuncs.insert(par);
@@ -99,16 +102,27 @@ funcion:        tipoovoid ID
                 LEFTPARENTHESIS parametros RIGHTPARENTHESIS bloque funcion
             |   /*null*/
 ;
-            
+
 tipoovoid:      tipo    { $$ = $1; }
             |   VOID    { $$ = TIPO_VOID; }
             ;
             
-parametros: 	tipo ID parametros2
+parametros: 	tipo ID
+                {
+                    int tipo = $1;
+                    string nomVariable = $2;
+                    Variable nuevaVariableLocal(nomVariable, tipo);
+                    bool yaExistia = tablaFuncs[nomFuncion].InsertaVar(nuevaVariableLocal);
+                    if(yaExistia){
+                        yyerror("Variable local declarada dos veces.");
+                        YYERROR;
+                    }
+                }
+                listaparametros
             |   /*vacio*/
             ;
 
-parametros2:    COMMA parametros
+listaparametros:    COMMA parametros
             |   /*null*/
             ;
 
@@ -147,7 +161,24 @@ condicionelse: 		  ELSE bloque
 					| /*vacio*/
 ;
 
-llamadafuncion:		  ID LEFTPARENTHESIS llamadafuncion2
+llamadafuncion:		  ID LEFTPARENTHESIS
+                      {
+                        string nomVar = $1;
+                                                
+                        unordered_map<string,Funcion>::const_iterator it = tablaFuncs.find(nomVar);
+                        if(it == tablaFuncs.end())
+                        {
+                        //nada
+                        }
+                        else
+                        {
+                            yyerror("Llamaste una funcion que no existe.");
+                            YYERROR;
+                        }
+                        
+
+                      }
+                      llamadafuncion2
 ;
 llamadafuncion2:	  RIGHTPARENTHESIS SEMICOLON
 					| paramsllamada RIGHTPARENTHESIS SEMICOLON
