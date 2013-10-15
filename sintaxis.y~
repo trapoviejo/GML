@@ -15,6 +15,7 @@
  
     extern string nomPrograma;
     extern unordered_map<string, Funcion> tablaFuncs;
+    extern unordered_map<string, Funcion> tablaVars;
     extern int tipoActual; 
     extern string nomFuncion;
     
@@ -168,8 +169,12 @@ llamadafuncion:		  ID LEFTPARENTHESIS
                         unordered_map<string,Funcion>::const_iterator it = tablaFuncs.find(nomVar);
                         if(it == tablaFuncs.end())
                         {
-                           yyerror("Llamaste una funcion que no existe.");
-                           YYERROR;
+                        //nada
+                        }
+                        else
+                        {
+                            yyerror("Llamaste una funcion que no existe.");
+                            YYERROR;
                         }
                         
 

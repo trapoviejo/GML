@@ -1,0 +1,37 @@
+program mijuego;
+vars int: vidas;
+	 float: puntos;
+	 pos: meta1,meta2,meta3;
+	 list_entity: malos;
+	 entity: heroe;
+mapsize [256,78];
+
+void mataMalo(){
+	malos_rem;
+	puntos = puntos + 100;
+}
+
+void sumaPuntos(float points, int x){
+	if((puntos+points)<9999){
+		puntos = puntos + points;
+	}
+}
+
+{
+	heroe = entity ([1,1], sprite "C:/heroe.gif", false);
+	
+	meta1 = [50,10];
+	meta2 = [100,50];
+	meta3 = meta1 + meta2;
+    	
+	if((heroe_x == meta1_x) && (heroe_y == meta1_y)){
+		sumaPuntos(1000);
+	}
+	
+	while(malos:1_x == heroe_x){
+		malos:1_y = malos:1_y + 1;
+	}
+	
+	lol();
+
+}
