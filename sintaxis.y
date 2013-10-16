@@ -95,9 +95,17 @@ funcion:        tipoovoid ID
                 {
                     int tipo = $1;
                     nomFuncion = $2;
-                    Funcion nuevaFuncion(nomFuncion, tipo);
-                    std::pair<std::string,Funcion> par (nomFuncion, nuevaFuncion);
-                    tablaFuncs.insert(par);
+                    unordered_map<string,Funcion>::const_iterator it = tablaVars.find(nomFuncion);
+                    if(it == tablaVars.end()){
+                        //No existia la funcion, entonces la creo
+                        Funcion nuevaFuncion(nomFuncion, tipo);
+                        std::pair<std::string,Funcion> par (nomFuncion, nuevaFuncion);
+                        tablaFuncs.insert(par);
+                    }else{
+                        //Ya existia la funcion, asi que hay error
+                        yyerror("Funcion declarada dos veces");
+                        YYERROR;
+                    }
                 }
                 LEFTPARENTHESIS parametros RIGHTPARENTHESIS bloque funcion
             |   /*null*/
