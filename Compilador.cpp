@@ -9,17 +9,16 @@ Compilador::~Compilador() {
 }
 
 bool Compilador::InsertaFunc(string nomFunc, int tipo) {
-    unordered_map<string,Funcion>::const_iterator it = tablaVars.find(nomFunc);
-    if(it == tablaVars.end()){
-        //No existia la funcion, entonces la creo e inserto en la tabla
-        Funcion func(nomFunc, tipo);
-        std::pair<std::string,Funcion> par (nomFunc, func);
-        tablaFuncs.insert(par);
-        //funcionActual = nomFunc;
-        funcionActual = func;
-        return true;
-    }
-    return false; //No inserte la funcion (ya existia)
+    
+    if(ExisteFunc(nomFunc))
+        return false; //Ya existia, por lo tanto no inserto
+
+    //No existia la funcion, entonces la creo e inserto en la tabla
+    Funcion func(nomFunc, tipo);
+    std::pair<std::string,Funcion> par (nomFunc, func);
+    tablaFuncs.insert(par);
+    funcionActual = func;
+    return true;
 }
 
 bool Compilador::ExisteFunc(string nomFunc) {
@@ -27,10 +26,8 @@ bool Compilador::ExisteFunc(string nomFunc) {
     return (it != tablaFuncs.end());
 }
 
-bool Compilador::InsertaVarEnFuncActual(String nombre, int tipo) {
-    Variable var(nombre, tipo);
-    //return tablaFuncs[funcionActual].InsertaVar(var);
-    return funcionActual.InsertaVar(var);
+bool Compilador::InsertaVarEnFuncActual(string nombre, int tipo) {
+    return funcionActual.InsertaVar(nombre, tipo);
 }
 
 bool Compilador::ExisteVar(string nomVar) {
