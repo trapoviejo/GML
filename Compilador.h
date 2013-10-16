@@ -24,7 +24,7 @@ public:
     bool ExisteVar(string nomVar);
     void ImprimeTablaFuncs(bool conVars);
     string nomPrograma;
-    Funcion funcionActual;
+    string funcionActual;
     int tipoActual;
 private:
     unordered_map<string, Funcion> tablaFuncs;

@@ -17,7 +17,7 @@ bool Compilador::InsertaFunc(string nomFunc, int tipo) {
     Funcion func(nomFunc, tipo);
     std::pair<std::string,Funcion> par (nomFunc, func);
     tablaFuncs.insert(par);
-    funcionActual = func;
+    funcionActual = nomFunc;
     return true;
 }
 
@@ -27,15 +27,15 @@ bool Compilador::ExisteFunc(string nomFunc) {
 }
 
 bool Compilador::InsertaVarEnFuncActual(string nombre, int tipo) {
-    return funcionActual.InsertaVar(nombre, tipo);
+    return tablaFuncs[funcionActual].InsertaVar(nombre, tipo);
 }
 
 bool Compilador::ExisteVar(string nomVar) {
     //Revisar primero en scope actual (funcionActual)
-    if(funcionActual.ExisteVar(nomVar)){
+    if(tablaFuncs[funcionActual].ExisteVar(nomVar)){
         return true;
     //Revisar en variables globales (nomPrograma)
-    }else if((nomPrograma != funcionActual) && nomPrograma.ExisteVar(nomVar)){
+    }else if((nomPrograma != funcionActual) && tablaFuncs[nomPrograma].ExisteVar(nomVar)){
         return true;
     }
     return false;
@@ -59,7 +59,7 @@ void Compilador::ImprimeTablaFuncs(bool conVars) {
     }
 }
 
-Compilador compilador();
+Compilador compilador;
 
 int main(void){
 
@@ -68,7 +68,7 @@ int main(void){
     else
         cout << "MAAAAAL!\n";
     
-    compilador.ImprimeTablaFuncs();
+    compilador.ImprimeTablaFuncs(true);
     
     return 0;
 }
