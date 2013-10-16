@@ -63,12 +63,12 @@ Compilador compilador;
 
 int main(void){
 
-    if (yyparse()==0)
+    if (yyparse()==0){
         cout << "Apropiado!\n";
+        compilador.ImprimeTablaFuncs(true);
+    }
     else
         cout << "MAAAAAL!\n";
-    
-    compilador.ImprimeTablaFuncs(true);
-    
+
     return 0;
 }

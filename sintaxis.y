@@ -117,9 +117,17 @@ estatuto: asignacion|condicion|escritura|ciclowhile|ciclodowhile|regreso
 |llamadafuncion|agregar|remover
 ;
 asignacion: porasignar e7 e8 ;
-porasignar:		  ID porasignar2
-				| elemento porasignar2
-;
+
+porasignar:     ID porasignar2
+                {
+                    if(compilador.ExisteVar($1)){
+                        yyerror("No existe la variable utilizada");
+                        YYERROR;
+                    }
+                }
+			|   elemento porasignar2
+            ;
+
 porasignar2:	  X
 				| Y
 				| /*vacio*/
@@ -230,6 +238,12 @@ obtenerxy:	  LEFTPARENTHESIS expresion RIGHTPARENTHESIS
 ;
 
 varcte:		  ID
+            {
+                if(compilador.ExisteVar($1)){
+                    yyerror("No existe la variable utilizada");
+                    YYERROR;
+                }
+            }
 			| CTEINT
 			| CTEFLOAT
 			| CTESTRING
