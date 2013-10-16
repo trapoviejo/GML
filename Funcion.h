@@ -12,9 +12,10 @@ using namespace std;
 class Funcion {
 public:
   Funcion();
-  Funcion(string name, int tipo);
+  Funcion(string nombre, int tipo);
   ~Funcion();
   bool InsertaVar(Variable var);
+  bool ExisteVar(string nombre);
   string nombre;
   int tipo;
   unordered_map<string,Variable> tablaVars;

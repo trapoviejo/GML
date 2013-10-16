@@ -8,31 +8,39 @@ Compilador::~Compilador() {
     //TODO
 }
 
-bool Compilador::InsertaFunc(string nombre, int tipo) {
-    unordered_map<string,Funcion>::const_iterator it = tablaVars.find(funcionActual);
+bool Compilador::InsertaFunc(string nomFunc, int tipo) {
+    unordered_map<string,Funcion>::const_iterator it = tablaVars.find(nomFunc);
     if(it == tablaVars.end()){
         //No existia la funcion, entonces la creo e inserto en la tabla
-        Funcion func(nombre, tipo);
-        std::pair<std::string,Funcion> par (funcionActual, func);
+        Funcion func(nomFunc, tipo);
+        std::pair<std::string,Funcion> par (nomFunc, func);
         tablaFuncs.insert(par);
-        funcionActual = nombre;
+        //funcionActual = nomFunc;
+        funcionActual = func;
         return true;
     }
     return false; //No inserte la funcion (ya existia)
 }
 
-bool Compilador::ExisteFunc(string func) {
-    unordered_map<string,Funcion>::const_iterator it = tablaFuncs.find(func);
+bool Compilador::ExisteFunc(string nomFunc) {
+    unordered_map<string,Funcion>::const_iterator it = tablaFuncs.find(nomFunc);
     return (it != tablaFuncs.end());
 }
 
 bool Compilador::InsertaVarEnFuncActual(String nombre, int tipo) {
     Variable var(nombre, tipo);
-    return tablaFuncs[funcionActual].InsertaVar(var);
+    //return tablaFuncs[funcionActual].InsertaVar(var);
+    return funcionActual.InsertaVar(var);
 }
 
-bool Compilador::ExisteVar(string var) {
-    //TODO
+bool Compilador::ExisteVar(string nomVar) {
+    //Revisar primero en scope actual (funcionActual)
+    if(funcionActual.ExisteVar(nomVar)){
+        return true;
+    //Revisar en variables globales (nomPrograma)
+    }else if((nomPrograma != funcionActual) && nomPrograma.ExisteVar(nomVar)){
+        return true;
+    }
     return false;
 }
 

@@ -39,7 +39,7 @@ LEFTBRACKET RIGHTBRACKET
 programa:   PROGRAM ID
             {
                 compilador.nomPrograma = $2;
-                compilador.InsertaFunc($2);
+                compilador.InsertaFunc($2, TIPO_PROGRAMA);
             }
             SEMICOLON variables mapa funcion bloque
 ;

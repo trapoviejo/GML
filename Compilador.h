@@ -20,10 +20,11 @@ public:
     ~Compilador();
     bool InsertaFunc(string nombre, int tipo);
     bool InsertaVarEnFuncActual(string nombre, int tipo);
-    bool ExisteFuncion(string func);
-    bool ExisteVariable(string var);
+    bool ExisteFunc(string nomFunc);
+    bool ExisteVar(string nomVar);
+    void ImprimeTablaFuncs(bool conVars);
     string nomPrograma;
-    string funcionActual;
+    Funcion funcionActual;
     int tipoActual;
 private:
     unordered_map<string, Funcion> tablaFuncs;

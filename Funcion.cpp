@@ -16,13 +16,16 @@ Funcion::~Funcion() {
 }
 
 bool Funcion::InsertaVar(Variable var) {
-    
-    unordered_map<string,Variable>::const_iterator it = tablaVars.find(var.nombre);
-    if(it == tablaVars.end()){
+    if(!ExisteVar(var.nombre)){
         std::pair<std::string,Variable> par (var.nombre, var);
         tablaVars.insert(par);
         return true; //Inserte la variable
     }
     return false; //No inserte la variable
+}
+
+bool Funcion::ExisteVar(string nombre) {
+    unordered_map<string,Variable>::const_iterator it = tablaVars.find(nombre);
+    return (it != tablaVars.end());
 }
 
