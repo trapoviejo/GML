@@ -21,8 +21,8 @@ bool Funcion::InsertaVar(Variable var) {
     if(it == tablaVars.end()){
         std::pair<std::string,Variable> par (var.nombre, var);
         tablaVars.insert(par);
-        return false;
+        return true; //Inserte la variable
     }
-    return true;
+    return false; //No inserte la variable
 }
 

@@ -9,14 +9,11 @@
     #include "Funcion.h"
     #include "Variable.h"
     #include "gml.tipos.h"
+    #include "Compilador.h"
 
     using namespace std;
 
- 
-    extern string nomPrograma;
-    extern unordered_map<string, Funcion> tablaFuncs;
-    extern int tipoActual; 
-    extern string nomFuncion;
+    extern Compilador compilador;
     
 %}
 
@@ -41,21 +38,16 @@ LEFTBRACKET RIGHTBRACKET
 %%
 programa:   PROGRAM ID
             {
-                nomPrograma = $2;
-                Funcion funcionPrograma(nomPrograma, TIPO_PROGRAMA);
-                std::pair<std::string,Funcion> par (nomPrograma, funcionPrograma);
-                tablaFuncs.insert(par);
+                compilador.nomPrograma = $2;
+                compilador.InsertaFunc($2);
             }
             SEMICOLON variables mapa funcion bloque
 ;
 
 variables:      VARS tipo COLON ID
                 {
-                    tipoActual = $2;
-                    string nomID = $4;
-                    Variable nuevaVar(nomID, tipoActual);
-                    bool yaExistia = tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
-                    if(yaExistia){
+                    compilador.tipoActual = $2;
+                    if(!compilador.InsertaVarEnFuncActual($4, $2)){
                         yyerror("Variable declarada dos veces.");
                         YYERROR;
                     }
@@ -65,10 +57,7 @@ variables:      VARS tipo COLON ID
 ;
 listaids:       COMMA ID
                 {
-                    string nomID = $2;
-                    Variable nuevaVar(nomID, tipoActual);
-                    bool yaExistia = tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
-                    if(yaExistia){
+                    if(!compilador.InsertaVarEnFuncActual($2, compilador.tipoActual)){
                         yyerror("Variable declarada dos veces.");
                         YYERROR;
                     }
@@ -78,11 +67,8 @@ listaids:       COMMA ID
 ;
 varsotrotipo:   tipo COLON ID
                 {
-                    tipoActual = $1;
-                    string nomID = $3;
-                    Variable nuevaVar(nomID, tipoActual);
-                    bool yaExistia = tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
-                    if(yaExistia){
+                    compilador.tipoActual = $1;
+                    if(!compilador.InsertaVarEnFuncActual($3, $1)){
                         yyerror("Variable declarada dos veces.");
                         YYERROR;
                     }
@@ -93,16 +79,8 @@ varsotrotipo:   tipo COLON ID
 
 funcion:        tipoovoid ID 
                 {
-                    int tipo = $1;
-                    nomFuncion = $2;
-                    unordered_map<string,Funcion>::const_iterator it = tablaVars.find(nomFuncion);
-                    if(it == tablaVars.end()){
-                        //No existia la funcion, entonces la creo
-                        Funcion nuevaFuncion(nomFuncion, tipo);
-                        std::pair<std::string,Funcion> par (nomFuncion, nuevaFuncion);
-                        tablaFuncs.insert(par);
-                    }else{
-                        //Ya existia la funcion, asi que hay error
+                    if(!compilador.InsertaFunc($2, $1)){
+                        //No inserto la funcion porque ya existia, asi que hay error
                         yyerror("Funcion declarada dos veces");
                         YYERROR;
                     }
@@ -117,12 +95,8 @@ tipoovoid:      tipo    { $$ = $1; }
             
 parametros: 	tipo ID
                 {
-                    int tipo = $1;
-                    string nomVariable = $2;
-                    Variable nuevaVariableLocal(nomVariable, tipo);
-                    bool yaExistia = tablaFuncs[nomFuncion].InsertaVar(nuevaVariableLocal);
-                    if(yaExistia){
-                        yyerror("Variable local declarada dos veces.");
+                    if(!compilador.InsertaVarEnFuncActual($2, $1)){
+                        yyerror("Variable declarada dos veces.");
                         YYERROR;
                     }
                 }
@@ -171,19 +145,14 @@ condicionelse: 		  ELSE bloque
 
 llamadafuncion:		  ID LEFTPARENTHESIS
                       {
-                        string nomVar = $1;
-                                                
-                        unordered_map<string,Funcion>::const_iterator it = tablaFuncs.find(nomVar);
-                        if(it == tablaFuncs.end())
+                        if(!compilador.ExisteFunc($1))
                         {
-                           yyerror("Llamaste una funcion que no existe.");
+                           yyerror("Llamada a funcion no declarada.");
                            YYERROR;
                         }
-                        
-
                       }
                       llamadafuncion2
-;
+                ;
 llamadafuncion2:	  RIGHTPARENTHESIS SEMICOLON
 					| paramsllamada RIGHTPARENTHESIS SEMICOLON
 ;

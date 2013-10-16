@@ -1,29 +1,42 @@
-#include <iostream>
-#include <string>
-#include <stdlib.h>
-#include <unordered_map>
-#include "Funcion.h"
-#include "Variable.h"
-#include "y.tab.h"
-#include "gml.tipos.h"
+#include "Compilador.h"
 
-int yyparse();
+Compilador::Compilador(){
+    //TODO... ?
+}
 
-using namespace std;
+Compilador::~Compilador() {
+    //TODO
+}
 
-unordered_map<string, Funcion> tablaFuncs; 
-string nomPrograma;
-int tipoActual;
-string nomFuncion;
+bool Compilador::InsertaFunc(string nombre, int tipo) {
+    unordered_map<string,Funcion>::const_iterator it = tablaVars.find(funcionActual);
+    if(it == tablaVars.end()){
+        //No existia la funcion, entonces la creo e inserto en la tabla
+        Funcion func(nombre, tipo);
+        std::pair<std::string,Funcion> par (funcionActual, func);
+        tablaFuncs.insert(par);
+        funcionActual = nombre;
+        return true;
+    }
+    return false; //No inserte la funcion (ya existia)
+}
 
-int main(void){
+bool Compilador::ExisteFunc(string func) {
+    unordered_map<string,Funcion>::const_iterator it = tablaFuncs.find(func);
+    return (it != tablaFuncs.end());
+}
 
-    if (yyparse()==0)
-        cout << "Apropiado!\n";
-    else
-        cout << "MAAAAAL!\n";
-    cout << nomPrograma << endl;
-    
+bool Compilador::InsertaVarEnFuncActual(String nombre, int tipo) {
+    Variable var(nombre, tipo);
+    return tablaFuncs[funcionActual].InsertaVar(var);
+}
+
+bool Compilador::ExisteVar(string var) {
+    //TODO
+    return false;
+}
+
+void Compilador::ImprimeTablaFuncs(bool conVars) {
     Funcion estaFunc;
     Variable estaVar;
     for ( auto it = tablaFuncs.begin(); it != tablaFuncs.end(); ++it ){
@@ -31,11 +44,26 @@ int main(void){
         estaFunc = tablaFuncs[key];
         cout << "Funcion: " << estaFunc.nombre << ", tipo: " << estaFunc.tipo << endl;
         
-        for ( auto it = (estaFunc.tablaVars).begin(); it != (estaFunc.tablaVars).end(); ++it ){
-            string keyVar = it->first;
-            estaVar = estaFunc.tablaVars[keyVar];
-            cout << "\tVariable: " << estaVar.nombre << ", tipo: " << estaVar.tipo << endl;
+        if(conVars){
+            for ( auto it = (estaFunc.tablaVars).begin(); it != (estaFunc.tablaVars).end(); ++it ){
+                string keyVar = it->first;
+                estaVar = estaFunc.tablaVars[keyVar];
+                cout << "\tVariable: " << estaVar.nombre << ", tipo: " << estaVar.tipo << endl;
+            }
         }
     }
+}
+
+Compilador compilador();
+
+int main(void){
+
+    if (yyparse()==0)
+        cout << "Apropiado!\n";
+    else
+        cout << "MAAAAAL!\n";
+    
+    compilador.ImprimeTablaFuncs();
+    
     return 0;
 }
