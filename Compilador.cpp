@@ -71,34 +71,52 @@ void Compilador::InicializaMemoria(){
 }
 
 bool Compilador::InsertaOperando(string nombre, int tipo, int clase){
+    Variable operando;
     switch (clase) {
         case GML_ES_VARIABLE:
             //Checa por existencia
             if(!ExisteVar(nombre)){
                 return false;
             }
-            //Inserta operando
+            //Obtiene operando apropiado
+            operando = GetVar(nombre);
             
+            break;
         
         case GML_ES_CONSTANTE:
+            //Inserta la constante
+            InsertaConst(nombre, tipo);
+            //Obtiene operando apropiado
+            operando = tablaConsts[nombre];
+            
+            break;
         
         case GML_ES_TEMPORAL:
+            //No hace nada en especial
+            //Mas que insertar a la pila que es despues
+            break;
         
         default:
             return false; //Debe ser de una de las clases anteriores
             break;
     }
+    
+    pilaOperandos.push(operando);
+    return true;
 }
 
 Variable Compilador::GetVar(string nomVar) {
+    Variable var;
+    
     //Revisar primero en scope actual (funcionActual)
-    if(tablaFuncs[funcionActual].ExisteVar(nomVar)){
-        return null;
+    var = tablaFuncs[funcionActual].GetVar(nomVar);
+    
     //Revisar en variables globales (nomPrograma)
-    }else if((nomPrograma != funcionActual) && tablaFuncs[nomPrograma].ExisteVar(nomVar)){
-        return null;
-    }
-    return null;
+    /*if((var == null) && (nomPrograma != funcionActual)){
+        var = tablaFuncs[nomPrograma].GetVar(nomVar);
+    }*/
+    
+    return var;
 }
 
 void Compilador::InsertaConst(string constante, int tipo){

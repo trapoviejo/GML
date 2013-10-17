@@ -39,11 +39,12 @@ bool Funcion::ExisteVar(string nombre) {
 }
 
 Variable Funcion::GetVar(string nombre) {
+    Variable var;
     unordered_map<string,Variable>::const_iterator it = tablaVars.find(nombre);
     if(ExisteVar(nombre)){
         string key = it->first;
-        return tablaVars[key];
+        var = tablaVars[key];
     }
-    return null;
+    return var;
 }
 
