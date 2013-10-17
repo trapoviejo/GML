@@ -5,6 +5,7 @@
 #include <string>
 #include <stdlib.h>
 #include <unordered_map>
+#include <stack>
 #include "Funcion.h"
 #include "Variable.h"
 #include "y.tab.h"
