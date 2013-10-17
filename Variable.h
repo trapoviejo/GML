@@ -11,6 +11,7 @@ class Variable {
 public:
   Variable();
   Variable(string nombre, int tipo);
+  Variable(string nombre, int tipo, int direccion);
   ~Variable();
   string nombre;
   int tipo;

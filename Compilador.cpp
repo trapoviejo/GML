@@ -27,7 +27,16 @@ bool Compilador::ExisteFunc(string nomFunc) {
 }
 
 bool Compilador::InsertaVarEnFuncActual(string nombre, int tipo) {
-    return tablaFuncs[funcionActual].InsertaVar(nombre, tipo);
+    int scope;
+    if(funcionActual == nomPrograma){
+        scope = 0; //scope global
+    }else{
+        scope = 1; //scope local
+    }
+    int memoriaAsignada = rangoMemoria[scope][0][tipo-10000];
+    rangoMemoria[scope][0][tipo-10000]++;
+    Variable var(nombre, tipo, memoriaAsignada);
+    return tablaFuncs[funcionActual].InsertaVar(var);
 }
 
 bool Compilador::ExisteVar(string nomVar) {
@@ -53,7 +62,7 @@ void Compilador::ImprimeTablaFuncs(bool conVars) {
             for ( auto it = (estaFunc.tablaVars).begin(); it != (estaFunc.tablaVars).end(); ++it ){
                 string keyVar = it->first;
                 estaVar = estaFunc.tablaVars[keyVar];
-                cout << "\tVariable: " << estaVar.nombre << ", tipo: " << estaVar.tipo << endl;
+                cout << "\tVariable: " << estaVar.nombre << ", tipo: " << estaVar.tipo << ", direccion: " << estaVar.direccion << endl;
             }
         }
     }

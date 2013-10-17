@@ -120,7 +120,7 @@ asignacion: porasignar e7 e8 ;
 
 porasignar:     ID porasignar2
                 {
-                    if(compilador.ExisteVar($1)){
+                    if(!compilador.ExisteVar($1)){
                         yyerror("No existe la variable utilizada");
                         YYERROR;
                     }
@@ -239,7 +239,7 @@ obtenerxy:	  LEFTPARENTHESIS expresion RIGHTPARENTHESIS
 
 varcte:		  ID
             {
-                if(compilador.ExisteVar($1)){
+                if(!compilador.ExisteVar($1)){
                     yyerror("No existe la variable utilizada");
                     YYERROR;
                 }

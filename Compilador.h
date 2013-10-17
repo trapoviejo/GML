@@ -9,6 +9,7 @@
 #include "Variable.h"
 #include "y.tab.h"
 #include "gml.tipos.h"
+#include "memoria.h"
 
 int yyparse();
 
