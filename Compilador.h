@@ -9,7 +9,6 @@
 #include "Variable.h"
 #include "y.tab.h"
 #include "gml.tipos.h"
-#include "memoria.h"
 
 int yyparse();
 
@@ -24,9 +23,11 @@ public:
     bool ExisteFunc(string nomFunc);
     bool ExisteVar(string nomVar);
     void ImprimeTablaFuncs(bool conVars);
+    void InicializaMemoria();
     string nomPrograma;
     string funcionActual;
     int tipoActual;
+    int rangoMemoria[2][3][7];
 private:
     unordered_map<string, Funcion> tablaFuncs;
 };
