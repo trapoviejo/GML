@@ -30,6 +30,10 @@ public:
     string funcionActual;
     int tipoActual;
     int rangoMemoria[2][3][7];
+    stack<Variable> pilaOperandos;
+    stack<int> pilaOperadores;
+    bool InsertaOperando(string nombre, int tipo, int clase);
+    Variable GetVar(string nombre);
 private:
     unordered_map<string, Funcion> tablaFuncs;
     unordered_map<string, Variable> tablaConsts;

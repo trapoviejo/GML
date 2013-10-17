@@ -17,6 +17,7 @@ public:
   bool InsertaVar(Variable var);
     bool InsertaVar(string nomVar, int tipo);
   bool ExisteVar(string nombre);
+    Variable GetVar(string nombre);
   string nombre;
   int tipo;
   unordered_map<string,Variable> tablaVars;

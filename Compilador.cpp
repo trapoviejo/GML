@@ -70,6 +70,37 @@ void Compilador::InicializaMemoria(){
     rangoMemoria[1][2][6] = 41000;  //list
 }
 
+bool Compilador::InsertaOperando(string nombre, int tipo, int clase){
+    switch (clase) {
+        case GML_ES_VARIABLE:
+            //Checa por existencia
+            if(!ExisteVar(nombre)){
+                return false;
+            }
+            //Inserta operando
+            
+        
+        case GML_ES_CONSTANTE:
+        
+        case GML_ES_TEMPORAL:
+        
+        default:
+            return false; //Debe ser de una de las clases anteriores
+            break;
+    }
+}
+
+Variable Compilador::GetVar(string nomVar) {
+    //Revisar primero en scope actual (funcionActual)
+    if(tablaFuncs[funcionActual].ExisteVar(nomVar)){
+        return null;
+    //Revisar en variables globales (nomPrograma)
+    }else if((nomPrograma != funcionActual) && tablaFuncs[nomPrograma].ExisteVar(nomVar)){
+        return null;
+    }
+    return null;
+}
+
 void Compilador::InsertaConst(string constante, int tipo){
     //Checa si existe
     unordered_map<string,Variable>::const_iterator it = tablaConsts.find(constante);
