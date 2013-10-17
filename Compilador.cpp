@@ -70,6 +70,17 @@ void Compilador::InicializaMemoria(){
     rangoMemoria[1][2][6] = 41000;  //list
 }
 
+void Compilador::InsertaConst(string constante, int tipo){
+    //Checa si existe
+    unordered_map<string,Variable>::const_iterator it = tablaConsts.find(constante);
+    if(it == tablaConsts.end()){
+        Variable miConst(constante, tipo);
+        std::pair<std::string,Variable> par (constante, miConst);
+        tablaConsts.insert(par);
+    }
+    //Si ya existia no hace nada
+}
+
 bool Compilador::InsertaFunc(string nomFunc, int tipo) {
     
     if(ExisteFunc(nomFunc))
@@ -130,16 +141,28 @@ void Compilador::ImprimeTablaFuncs(bool conVars) {
     }
 }
 
+void Compilador::ImprimeTablaConsts(){
+    Variable estaConst;
+    for ( auto it = tablaConsts.begin(); it != tablaConsts.end(); ++it ){
+        string key = it->first;
+        estaConst = tablaConsts[key];
+        cout << "Constante: " << estaConst.nombre << ", tipo: " << estaConst.tipo << endl;
+    }
+}
+
 Compilador compilador;
 
 int main(void){
 
     if (yyparse()==0){
-        cout << "Apropiado!\n";
+        cout << "Apropiado!" << endl;
+        cout << endl << "Tabla de funciones con variables:" << endl;
         compilador.ImprimeTablaFuncs(true);
+        cout << endl << "Tabla de constantes:" << endl;
+        compilador.ImprimeTablaConsts();
     }
     else
-        cout << "MAAAAAL!\n";
+        cout << "MAAAAAL!" << endl;
 
     return 0;
 }

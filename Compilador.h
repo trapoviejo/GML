@@ -23,13 +23,16 @@ public:
     bool ExisteFunc(string nomFunc);
     bool ExisteVar(string nomVar);
     void ImprimeTablaFuncs(bool conVars);
+    void ImprimeTablaConsts();
     void InicializaMemoria();
+    void InsertaConst(string constante, int tipo);
     string nomPrograma;
     string funcionActual;
     int tipoActual;
     int rangoMemoria[2][3][7];
 private:
     unordered_map<string, Funcion> tablaFuncs;
+    unordered_map<string, Variable> tablaConsts;
 };
 
 #endif

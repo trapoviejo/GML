@@ -55,6 +55,6 @@ extern int yylex();
 [A-Za-z][A-Za-z0-9]*						{ yylval.id = strdup(yytext); return ID; }
 "\""[A-Za-z0-9:/.]*"\""						{ return CTESTRING; }
 "["[0-9]+","[0-9]+"]"						{ return CTEPOS; }
-[0-9]+"."[0-9]+								{ yylval.entero = atof(yytext); return CTEFLOAT; }
-[0-9]+										{ yylval.flotante = atoi(yytext); return CTEINT; }
+[0-9]+"."[0-9]+								{ yylval.id = strdup(yytext); return CTEFLOAT; }
+[0-9]+										{ yylval.id = strdup(yytext); return CTEINT; }
 %%

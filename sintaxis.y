@@ -23,9 +23,8 @@
   char* id;
 };
 
-%type<entero> CTEINT tipoovoid tipo tiposimple
-%type<flotante> CTEFLOAT
-%type<id> ID
+%type<entero> tipoovoid tipo tiposimple
+%type<id> ID CTEINT CTEFLOAT
 
 %token ID CTESTRING CTEINT CTEFLOAT CTEPOS TRUE FALSE PROGRAM VARS
 MAPSIZE DO WHILE IF ELSE RETURN DRAW VOID INT FLOAT POS BOOLEAN STRING 
@@ -237,20 +236,20 @@ obtenerxy:	  LEFTPARENTHESIS expresion RIGHTPARENTHESIS
 			| varcte
 ;
 
-varcte:		  ID
+varcte:	    ID
             {
                 if(!compilador.ExisteVar($1)){
                     yyerror("No existe la variable utilizada");
                     YYERROR;
                 }
             }
-			| CTEINT
-			| CTEFLOAT
-			| CTESTRING
-			| TRUE
-			| FALSE
-			| CTEPOS
-			| elemento
+        |   CTEINT      { compilador.InsertaConst($1, TIPO_INT); }
+        |   CTEFLOAT    { compilador.InsertaConst($1, TIPO_FLOAT); }
+        |   CTESTRING   
+        |   TRUE        
+        |   FALSE       
+        |   CTEPOS
+        |   elemento
 ;
 
 elemento:	  ID COLON elemento2
