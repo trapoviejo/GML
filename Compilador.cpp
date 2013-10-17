@@ -8,7 +8,7 @@ Compilador::~Compilador() {
     //TODO
 }
 
-bool Compilador::InicializaMemoria(){
+void Compilador::InicializaMemoria(){
     /*Dimensiones
      - global (0) o local (1)
      - variables (0), temporales (1), o constantes (2)
