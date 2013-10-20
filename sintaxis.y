@@ -26,7 +26,7 @@
 
 %type<entero> tipoovoid tipo tiposimple
 %type<id> ID CTEINT CTEFLOAT
-%type<op> PLUS MINUS MULTIPLICATION DIVISION OR AND EQUALS EQUALMORETHAN EQUALLESSTHAN NOT LESSTHAN MORETHAN X Y
+%type<op> PLUS MINUS MULTIPLICATION DIVISION OR AND EQUALS EQUALMORETHAN EQUALLESSTHAN NOT LESSTHAN MORETHAN X Y operadorexpresion
 
 %token ID CTESTRING CTEINT CTEFLOAT CTEPOS TRUE FALSE PROGRAM VARS
 MAPSIZE DO WHILE IF ELSE RETURN DRAW VOID INT FLOAT POS BOOLEAN STRING 
@@ -192,45 +192,73 @@ agregar:	  ID ADD LEFTPARENTHESIS expresion RIGHTPARENTHESIS SEMICOLON
 ;
 remover:	  ID REM SEMICOLON
 ;
-expresion:	  exp expresion2
+
+expresion:      exp
+                {
+                    if(compilador.ChecaPrioridad(OP_OR){
+                        bool sePudo = compilador.GeneraCuadruplo();
+                        if(!sePudo){
+                            yyerror("Incompatibilidad de tipos");
+                            YYERROR;
+                        }
+                    }
+                }
+                expresion2
 ;
-expresion2: 	  AND expresion
-				| OR expresion
-				| EQUALS expresion
-				| NOT expresion
-				| MORETHAN expresion
-				| LESSTHAN expresion
-				| EQUALMORETHAN expresion
-				| EQUALLESSTHAN expresion
-				| /*vacio*/
+expresion2:     operadorexpresion { compilador.InsertaOperador($1); } expresion
+            |   /*vacio*/
 ;
 
-exp:		  termino exp2
+operadorexpresion:      OR
+                    |   AND
+                    |   EQUALMORETHAN
+                    |   EQUALLESSTHAN
+                    |   MORETHAN
+                    |   LESSTHAN
+                    |   EQUALS
+                    |   NOT
 ;
-exp2:		  PLUS exp
-			| MINUS exp
+
+exp:            termino
+                {
+                    if(compilador.ChecaPrioridad(OP_SUMA){
+                        bool sePudo = compilador.GeneraCuadruplo();
+                        if(!sePudo){
+                            yyerror("Incompatibilidad de tipos");
+                            YYERROR;
+                        }
+                    }
+                }
+                exp2
+;
+exp2:		  operadorexp { compilador.InsertaOperador($1); } exp
 			| /*vacio*/
 ;
+operadorexp:    PLUS | MINUS ;
 
-termino:	  factor termino2
+termino:	    factor
+                {
+                    if(compilador.ChecaPrioridad(OP_MULTIPLICACION){
+                        bool sePudo = compilador.GeneraCuadruplo();
+                        if(!sePudo){
+                            yyerror("Incompatibilidad de tipos");
+                            YYERROR;
+                        }
+                    }
+                }
+                termino2
 ;
-termino2:	  MULTIPLICATION termino
-			| DIVISION termino
+termino2:	  operadortermino { compilador.InsertaOperador($1); } termino
 			| /*vacio*/
 ;
-
-entidad:	  ENTITY LEFTPARENTHESIS expresion COMMA SPRITE entidad2 
-;
-entidad2:	  CTESTRING COMMA expresion RIGHTPARENTHESIS
-			| ID COMMA expresion RIGHTPARENTHESIS
-;
+operadortermino:    MULTIPLICATION | DIVISION ;
 
 factor:		  obtenerxy factor2
 ;
-factor2:	  X
-			| Y
+factor2:	  operadorfactor
 			| /*vacio*/
 ;
+operadorfactor: X | Y ;
 
 obtenerxy:	  LEFTPARENTHESIS expresion RIGHTPARENTHESIS
 			| PLUS varcte
@@ -258,6 +286,12 @@ elemento:	  ID COLON elemento2
 ;
 elemento2:	  CTEINT
 			| ID
+;
+
+entidad:	  ENTITY LEFTPARENTHESIS expresion COMMA SPRITE entidad2 
+;
+entidad2:	  CTESTRING COMMA expresion RIGHTPARENTHESIS
+			| ID COMMA expresion RIGHTPARENTHESIS
 ;
  
 %%

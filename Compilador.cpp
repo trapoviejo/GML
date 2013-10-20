@@ -108,6 +108,29 @@ bool Compilador::InsertaOperando(string nombre, int tipo, int clase){
     return true;
 }
 
+bool Compilador::InsertaOperador(gml_operador op){
+    pilaOperadores.push(op);
+    return true;
+}
+
+bool Compilador::ChecaPrioridad(gml_operador actual){
+    if(pilaOperadores.empty()){
+        return false; //No genero cuadruplo si no hay operador pendiente!
+    }
+    gml_operador pendiente = pilaOperadores.top();
+    if(pendiente < actual){
+        //No genero cuadruplo si el pendiente es de menor prioridad que el nivel actual!
+        return false;
+    }
+    //Si hay pendiente y es de mayor o igual prioridad, debo generar cuadruplo!
+    return true;
+}
+
+bool Compilador::GeneraCuadruplo(){
+    //TODO
+    return true;
+}
+
 Variable Compilador::GetVar(string nomVar) {
     Variable var;
     
@@ -205,7 +228,8 @@ void Compilador::ImprimeTablaConsts(){
 void Compilador::ImprimePilaOperandos(){
     Variable esteOperando;
     while( ! pilaOperandos.empty() ){
-        esteOperando = pilaOperandos.pop();
+        esteOperando = pilaOperandos.top();
+        pilaOperandos.pop();
         cout << "Operando: " << esteOperando.nombre << ", tipo: " << esteOperando.tipo << endl;
     }
 }

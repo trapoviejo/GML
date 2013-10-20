@@ -10,6 +10,7 @@
 #include "Variable.h"
 #include "y.tab.h"
 #include "gml.tipos.h"
+#include "gml.operadores.h"
 
 int yyparse();
 
@@ -28,12 +29,15 @@ public:
     void ImprimePilaOperandos();
     void InicializaMemoria();
     void InsertaConst(string constante, int tipo);
+    void InsertaOperador(gml_operador op);
+    bool ChecaPrioridad(gml_operador actual);
+    bool GeneraCuadruplo();
     string nomPrograma;
     string funcionActual;
     int tipoActual;
     int rangoMemoria[2][3][7];
     stack<Variable> pilaOperandos;
-    stack<int> pilaOperadores;
+    stack<gml_operador> pilaOperadores;
     bool InsertaOperando(string nombre, int tipo, int clase);
     Variable GetVar(string nombre);
 private:

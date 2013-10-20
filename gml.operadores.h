@@ -1,7 +1,7 @@
 #ifndef GML_OPERADORES
 #define GML_OPERADORES
 
-enum gmloperadores
+enum gml_operador
 {
     OP_OR = 20000,
     OP_AND = 20001,
