@@ -29,15 +29,15 @@ public:
     void ImprimePilaOperandos();
     void InicializaMemoria();
     void InsertaConst(string constante, int tipo);
-    void InsertaOperador(gml_operador op);
-    bool ChecaPrioridad(gml_operador actual);
+    void InsertaOperador(int op);
+    bool ChecaPrioridad(int actual);
     bool GeneraCuadruplo();
     string nomPrograma;
     string funcionActual;
     int tipoActual;
     int rangoMemoria[2][3][7];
     stack<Variable> pilaOperandos;
-    stack<gml_operador> pilaOperadores;
+    stack<int> pilaOperadores;
     bool InsertaOperando(string nombre, int tipo, int clase);
     Variable GetVar(string nombre);
 private:

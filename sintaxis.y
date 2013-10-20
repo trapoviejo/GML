@@ -24,7 +24,7 @@
   int entero; 
   float flotante;
   char* id;
-  gml_operador op;
+  int op;
 };
 
 %type<entero> tipoovoid tipo tiposimple

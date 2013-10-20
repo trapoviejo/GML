@@ -108,16 +108,16 @@ bool Compilador::InsertaOperando(string nombre, int tipo, int clase){
     return true;
 }
 
-bool Compilador::InsertaOperador(gml_operador op){
+bool Compilador::InsertaOperador(int op){
     pilaOperadores.push(op);
     return true;
 }
 
-bool Compilador::ChecaPrioridad(gml_operador actual){
+bool Compilador::ChecaPrioridad(int actual){
     if(pilaOperadores.empty()){
         return false; //No genero cuadruplo si no hay operador pendiente!
     }
-    gml_operador pendiente = pilaOperadores.top();
+    int pendiente = pilaOperadores.top();
     if(pendiente < actual){
         //No genero cuadruplo si el pendiente es de menor prioridad que el nivel actual!
         return false;
@@ -131,7 +131,7 @@ bool Compilador::GeneraCuadruplo(){
     pilaOperandos.pop();
     Variable operando1 = pilaOperandos.top();
     pilaOperandos.pop();
-    gml_operador operador = pilaOperador.top();
+    Variable operador = pilaOperador.top();
     pilaOperador.pop();
     /*if(SonCompatibles()){
     }*/
