@@ -9,6 +9,7 @@
     #include "Funcion.h"
     #include "Variable.h"
     #include "gml.tipos.h"
+    #include "gml.operadores.h"
     #include "Compilador.h"
 
     using namespace std;
@@ -17,16 +18,18 @@
     
 %}
 
+%code requires { #include "gml.operadores.h" }
+
 %union {
   int entero; 
   float flotante;
   char* id;
-  int op;
+  gml_operador op;
 };
 
 %type<entero> tipoovoid tipo tiposimple
 %type<id> ID CTEINT CTEFLOAT
-%type<op> PLUS MINUS MULTIPLICATION DIVISION OR AND EQUALS EQUALMORETHAN EQUALLESSTHAN NOT LESSTHAN MORETHAN X Y operadorexpresion
+%type<op> PLUS MINUS MULTIPLICATION DIVISION OR AND EQUALS EQUALMORETHAN EQUALLESSTHAN NOT LESSTHAN MORETHAN X Y operadorexpresion operadorexp operadortermino operadorfactor
 
 %token ID CTESTRING CTEINT CTEFLOAT CTEPOS TRUE FALSE PROGRAM VARS
 MAPSIZE DO WHILE IF ELSE RETURN DRAW VOID INT FLOAT POS BOOLEAN STRING 

@@ -127,7 +127,14 @@ bool Compilador::ChecaPrioridad(gml_operador actual){
 }
 
 bool Compilador::GeneraCuadruplo(){
-    //TODO
+    Variable operando2 = pilaOperandos.top();
+    pilaOperandos.pop();
+    Variable operando1 = pilaOperandos.top();
+    pilaOperandos.pop();
+    gml_operador operador = pilaOperador.top();
+    pilaOperador.pop();
+    /*if(SonCompatibles()){
+    }*/
     return true;
 }
 

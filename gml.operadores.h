@@ -1,6 +1,8 @@
 #ifndef GML_OPERADORES
 #define GML_OPERADORES
 
+namespace operadores{
+
 enum gml_operador
 {
     OP_OR = 20000,
@@ -18,6 +20,8 @@ enum gml_operador
     OP_X = 20012,
     OP_Y = 20013
 };
+
+}
 
 /* Tokens.  */
 #define OP_OR 20000
