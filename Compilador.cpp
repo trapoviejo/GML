@@ -96,7 +96,7 @@ bool Compilador::InsertaOperando(string nombre, int tipo, int clase){
             //TODO
             int dirAsignada = 5;
             //Crea una variable temporal
-            Variable operando(nombre, tipo, dirAsignada);
+            operando(nombre, tipo, dirAsignada);
             break;
         
         default:
@@ -135,6 +135,8 @@ bool Compilador::GeneraCuadruplo(){
     pilaOperador.pop();
     /*if(SonCompatibles()){
     }*/
+    cout << operador << " " << operando1.direccion << " " << operando2.direccion << " 5" endl;
+    pilaOperandos.push(5);
     return true;
 }
 

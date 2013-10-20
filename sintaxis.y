@@ -198,7 +198,7 @@ remover:	  ID REM SEMICOLON
 
 expresion:      exp
                 {
-                    if(compilador.ChecaPrioridad(OP_OR){
+                    if(compilador.ChecaPrioridad(OP_OR)){
                         bool sePudo = compilador.GeneraCuadruplo();
                         if(!sePudo){
                             yyerror("Incompatibilidad de tipos");
@@ -224,7 +224,7 @@ operadorexpresion:      OR
 
 exp:            termino
                 {
-                    if(compilador.ChecaPrioridad(OP_SUMA){
+                    if(compilador.ChecaPrioridad(OP_SUMA)){
                         bool sePudo = compilador.GeneraCuadruplo();
                         if(!sePudo){
                             yyerror("Incompatibilidad de tipos");
@@ -241,7 +241,7 @@ operadorexp:    PLUS | MINUS ;
 
 termino:	    factor
                 {
-                    if(compilador.ChecaPrioridad(OP_MULTIPLICACION){
+                    if(compilador.ChecaPrioridad(OP_MULTIPLICACION)){
                         bool sePudo = compilador.GeneraCuadruplo();
                         if(!sePudo){
                             yyerror("Incompatibilidad de tipos");
