@@ -92,8 +92,11 @@ bool Compilador::InsertaOperando(string nombre, int tipo, int clase){
             break;
         
         case GML_ES_TEMPORAL:
-            //No hace nada en especial
-            //Mas que insertar a la pila que es despues
+            //Determina donde poner la var temporal
+            //TODO
+            int dirAsignada = 5;
+            //Crea una variable temporal
+            Variable operando(nombre, tipo, dirAsignada);
             break;
         
         default:
@@ -112,9 +115,9 @@ Variable Compilador::GetVar(string nomVar) {
     var = tablaFuncs[funcionActual].GetVar(nomVar);
     
     //Revisar en variables globales (nomPrograma)
-    /*if((var == null) && (nomPrograma != funcionActual)){
+    if(!(tablaFuncs[funcionActual].ExisteVar(nomVar)) && (nomPrograma != funcionActual)){
         var = tablaFuncs[nomPrograma].GetVar(nomVar);
-    }*/
+    }
     
     return var;
 }
@@ -199,6 +202,14 @@ void Compilador::ImprimeTablaConsts(){
     }
 }
 
+void Compilador::ImprimePilaOperandos(){
+    Variable esteOperando;
+    while( ! pilaOperandos.empty() ){
+        esteOperando = pilaOperandos.pop();
+        cout << "Operando: " << esteOperando.nombre << ", tipo: " << esteOperando.tipo << endl;
+    }
+}
+
 Compilador compilador;
 
 int main(void){
@@ -209,6 +220,8 @@ int main(void){
         compilador.ImprimeTablaFuncs(true);
         cout << endl << "Tabla de constantes:" << endl;
         compilador.ImprimeTablaConsts();
+        cout << endl << "Pila de operandos:" << endl;
+        compilador.ImprimePilaOperandos();
     }
     else
         cout << "MAAAAAL!" << endl;

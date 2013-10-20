@@ -238,13 +238,13 @@ obtenerxy:	  LEFTPARENTHESIS expresion RIGHTPARENTHESIS
 
 varcte:	    ID
             {
-                if(!compilador.ExisteVar($1)){
+                if(!compilador.InsertaOperando($1, 0, GML_ES_VARIABLE)){
                     yyerror("No existe la variable utilizada");
                     YYERROR;
                 }
             }
-        |   CTEINT      { compilador.InsertaConst($1, TIPO_INT); }
-        |   CTEFLOAT    { compilador.InsertaConst($1, TIPO_FLOAT); }
+        |   CTEINT      { compilador.InsertaOperando($1, TIPO_INT, GML_ES_CONSTANTE); }
+        |   CTEFLOAT    { compilador.InsertaOperando($1, TIPO_FLOAT, GML_ES_CONSTANTE); }
         |   CTESTRING   
         |   TRUE        
         |   FALSE       

@@ -25,6 +25,7 @@ public:
     bool ExisteVar(string nomVar);
     void ImprimeTablaFuncs(bool conVars);
     void ImprimeTablaConsts();
+    void ImprimePilaOperandos();
     void InicializaMemoria();
     void InsertaConst(string constante, int tipo);
     string nomPrograma;
