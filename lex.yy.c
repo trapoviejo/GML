@@ -1075,12 +1075,12 @@ YY_RULE_SETUP
 case 50:
 YY_RULE_SETUP
 #line 58 "lexico.l"
-{ yylval.entero = atof(yytext); return CTEFLOAT; }
+{ yylval.id = strdup(yytext); return CTEFLOAT; }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
 #line 59 "lexico.l"
-{ yylval.flotante = atoi(yytext); return CTEINT; }
+{ yylval.id = strdup(yytext); return CTEINT; }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP

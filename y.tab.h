@@ -149,7 +149,7 @@ typedef union YYSTYPE
 {
 
 /* Line 2068 of yacc.c  */
-#line 23 "sintaxis.y"
+#line 20 "sintaxis.y"
 
   int entero; 
   float flotante;

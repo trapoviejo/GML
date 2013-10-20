@@ -78,19 +78,16 @@
     #include "Funcion.h"
     #include "Variable.h"
     #include "gml.tipos.h"
+    #include "Compilador.h"
 
     using namespace std;
 
- 
-    extern string nomPrograma;
-    extern unordered_map<string, Funcion> tablaFuncs;
-    extern int tipoActual; 
-    extern string nomFuncion;
+    extern Compilador compilador;
     
 
 
 /* Line 268 of yacc.c  */
-#line 94 "y.tab.c"
+#line 91 "y.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -229,7 +226,7 @@ typedef union YYSTYPE
 {
 
 /* Line 293 of yacc.c  */
-#line 23 "sintaxis.y"
+#line 20 "sintaxis.y"
 
   int entero; 
   float flotante;
@@ -238,7 +235,7 @@ typedef union YYSTYPE
 
 
 /* Line 293 of yacc.c  */
-#line 242 "y.tab.c"
+#line 239 "y.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -250,7 +247,7 @@ typedef union YYSTYPE
 
 
 /* Line 343 of yacc.c  */
-#line 254 "y.tab.c"
+#line 251 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -583,18 +580,18 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    43,    43,    42,    53,    52,    64,    67,    66,    77,
-      80,    79,    91,    95,    94,   103,   106,   107,   111,   110,
-     122,   125,   126,   129,   131,   132,   132,   134,   134,   134,
-     134,   134,   134,   135,   135,   135,   137,   138,   139,   141,
-     142,   143,   145,   145,   146,   146,   146,   148,   150,   150,
-     152,   154,   157,   160,   161,   165,   164,   179,   180,   182,
-     184,   185,   188,   190,   193,   194,   197,   198,   199,   200,
-     201,   202,   205,   207,   209,   211,   212,   213,   214,   215,
-     216,   217,   218,   219,   222,   224,   225,   226,   229,   231,
-     232,   233,   236,   238,   239,   242,   244,   245,   246,   249,
-     250,   251,   252,   255,   256,   257,   258,   259,   260,   261,
-     262,   265,   267,   268
+       0,    39,    39,    38,    47,    46,    55,    58,    57,    65,
+      68,    67,    76,    80,    79,    88,    91,    92,    96,    95,
+     103,   106,   107,   110,   112,   113,   113,   115,   115,   115,
+     115,   115,   115,   116,   116,   116,   118,   120,   127,   130,
+     131,   132,   134,   134,   135,   135,   135,   137,   139,   139,
+     141,   143,   146,   149,   150,   154,   153,   163,   164,   166,
+     168,   169,   172,   174,   177,   178,   181,   182,   183,   184,
+     185,   186,   189,   191,   193,   195,   196,   197,   198,   199,
+     200,   201,   202,   203,   206,   208,   209,   210,   213,   215,
+     216,   217,   220,   222,   223,   226,   228,   229,   230,   233,
+     234,   235,   236,   239,   246,   247,   248,   249,   250,   251,
+     252,   255,   257,   258
 };
 #endif
 
@@ -1670,25 +1667,20 @@ yyreduce:
         case 2:
 
 /* Line 1806 of yacc.c  */
-#line 43 "sintaxis.y"
+#line 39 "sintaxis.y"
     {
-                nomPrograma = (yyvsp[(2) - (2)].id);
-                Funcion funcionPrograma(nomPrograma, TIPO_PROGRAMA);
-                std::pair<std::string,Funcion> par (nomPrograma, funcionPrograma);
-                tablaFuncs.insert(par);
+                compilador.nomPrograma = (yyvsp[(2) - (2)].id);
+                compilador.InsertaFunc((yyvsp[(2) - (2)].id), TIPO_PROGRAMA);
             }
     break;
 
   case 4:
 
 /* Line 1806 of yacc.c  */
-#line 53 "sintaxis.y"
+#line 47 "sintaxis.y"
     {
-                    tipoActual = (yyvsp[(2) - (4)].entero);
-                    string nomID = (yyvsp[(4) - (4)].id);
-                    Variable nuevaVar(nomID, tipoActual);
-                    bool yaExistia = tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
-                    if(yaExistia){
+                    compilador.tipoActual = (yyvsp[(2) - (4)].entero);
+                    if(!compilador.InsertaVarEnFuncActual((yyvsp[(4) - (4)].id), (yyvsp[(2) - (4)].entero))){
                         yyerror("Variable declarada dos veces.");
                         YYERROR;
                     }
@@ -1698,12 +1690,9 @@ yyreduce:
   case 7:
 
 /* Line 1806 of yacc.c  */
-#line 67 "sintaxis.y"
+#line 58 "sintaxis.y"
     {
-                    string nomID = (yyvsp[(2) - (2)].id);
-                    Variable nuevaVar(nomID, tipoActual);
-                    bool yaExistia = tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
-                    if(yaExistia){
+                    if(!compilador.InsertaVarEnFuncActual((yyvsp[(2) - (2)].id), compilador.tipoActual)){
                         yyerror("Variable declarada dos veces.");
                         YYERROR;
                     }
@@ -1713,13 +1702,10 @@ yyreduce:
   case 10:
 
 /* Line 1806 of yacc.c  */
-#line 80 "sintaxis.y"
+#line 68 "sintaxis.y"
     {
-                    tipoActual = (yyvsp[(1) - (3)].entero);
-                    string nomID = (yyvsp[(3) - (3)].id);
-                    Variable nuevaVar(nomID, tipoActual);
-                    bool yaExistia = tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
-                    if(yaExistia){
+                    compilador.tipoActual = (yyvsp[(1) - (3)].entero);
+                    if(!compilador.InsertaVarEnFuncActual((yyvsp[(3) - (3)].id), (yyvsp[(1) - (3)].entero))){
                         yyerror("Variable declarada dos veces.");
                         YYERROR;
                     }
@@ -1729,41 +1715,49 @@ yyreduce:
   case 13:
 
 /* Line 1806 of yacc.c  */
-#line 95 "sintaxis.y"
+#line 80 "sintaxis.y"
     {
-                    int tipo = (yyvsp[(1) - (2)].entero);
-                    nomFuncion = (yyvsp[(2) - (2)].id);
-                    Funcion nuevaFuncion(nomFuncion, tipo);
-                    std::pair<std::string,Funcion> par (nomFuncion, nuevaFuncion);
-                    tablaFuncs.insert(par);
+                    if(!compilador.InsertaFunc((yyvsp[(2) - (2)].id), (yyvsp[(1) - (2)].entero))){
+                        //No inserto la funcion porque ya existia, asi que hay error
+                        yyerror("Funcion declarada dos veces");
+                        YYERROR;
+                    }
                 }
     break;
 
   case 16:
 
 /* Line 1806 of yacc.c  */
-#line 106 "sintaxis.y"
+#line 91 "sintaxis.y"
     { (yyval.entero) = (yyvsp[(1) - (1)].entero); }
     break;
 
   case 17:
 
 /* Line 1806 of yacc.c  */
-#line 107 "sintaxis.y"
+#line 92 "sintaxis.y"
     { (yyval.entero) = TIPO_VOID; }
     break;
 
   case 18:
 
 /* Line 1806 of yacc.c  */
-#line 111 "sintaxis.y"
+#line 96 "sintaxis.y"
     {
-                    int tipo = (yyvsp[(1) - (2)].entero);
-                    string nomVariable = (yyvsp[(2) - (2)].id);
-                    Variable nuevaVariableLocal(nomVariable, tipo);
-                    bool yaExistia = tablaFuncs[nomFuncion].InsertaVar(nuevaVariableLocal);
-                    if(yaExistia){
-                        yyerror("Variable local declarada dos veces.");
+                    if(!compilador.InsertaVarEnFuncActual((yyvsp[(2) - (2)].id), (yyvsp[(1) - (2)].entero))){
+                        yyerror("Variable declarada dos veces.");
+                        YYERROR;
+                    }
+                }
+    break;
+
+  case 37:
+
+/* Line 1806 of yacc.c  */
+#line 121 "sintaxis.y"
+    {
+                    if(!compilador.ExisteVar((yyvsp[(1) - (2)].id))){
+                        yyerror("No existe la variable utilizada");
                         YYERROR;
                     }
                 }
@@ -1772,81 +1766,102 @@ yyreduce:
   case 55:
 
 /* Line 1806 of yacc.c  */
-#line 165 "sintaxis.y"
+#line 154 "sintaxis.y"
     {
-                        string nomVar = (yyvsp[(1) - (2)].id);
-                                                
-                        unordered_map<string,Funcion>::const_iterator it = tablaFuncs.find(nomVar);
-                        if(it == tablaFuncs.end())
+                        if(!compilador.ExisteFunc((yyvsp[(1) - (2)].id)))
                         {
-                           yyerror("Llamaste una funcion que no existe.");
+                           yyerror("Llamada a funcion no declarada.");
                            YYERROR;
                         }
-                        
-
                       }
     break;
 
   case 64:
 
 /* Line 1806 of yacc.c  */
-#line 193 "sintaxis.y"
+#line 177 "sintaxis.y"
     { (yyval.entero) = (yyvsp[(1) - (1)].entero); }
     break;
 
   case 65:
 
 /* Line 1806 of yacc.c  */
-#line 194 "sintaxis.y"
+#line 178 "sintaxis.y"
     { (yyval.entero) = TIPO_LIST; }
     break;
 
   case 66:
 
 /* Line 1806 of yacc.c  */
-#line 197 "sintaxis.y"
+#line 181 "sintaxis.y"
     { (yyval.entero) = TIPO_INT; }
     break;
 
   case 67:
 
 /* Line 1806 of yacc.c  */
-#line 198 "sintaxis.y"
+#line 182 "sintaxis.y"
     { (yyval.entero) = TIPO_FLOAT; }
     break;
 
   case 68:
 
 /* Line 1806 of yacc.c  */
-#line 199 "sintaxis.y"
+#line 183 "sintaxis.y"
     { (yyval.entero) = TIPO_POS; }
     break;
 
   case 69:
 
 /* Line 1806 of yacc.c  */
-#line 200 "sintaxis.y"
+#line 184 "sintaxis.y"
     { (yyval.entero) = TIPO_BOOLEAN; }
     break;
 
   case 70:
 
 /* Line 1806 of yacc.c  */
-#line 201 "sintaxis.y"
+#line 185 "sintaxis.y"
     { (yyval.entero) = TIPO_STRING; }
     break;
 
   case 71:
 
 /* Line 1806 of yacc.c  */
-#line 202 "sintaxis.y"
+#line 186 "sintaxis.y"
     { (yyval.entero) = TIPO_ENTITY; }
+    break;
+
+  case 103:
+
+/* Line 1806 of yacc.c  */
+#line 240 "sintaxis.y"
+    {
+                if(!compilador.ExisteVar((yyvsp[(1) - (1)].id))){
+                    yyerror("No existe la variable utilizada");
+                    YYERROR;
+                }
+            }
+    break;
+
+  case 104:
+
+/* Line 1806 of yacc.c  */
+#line 246 "sintaxis.y"
+    { compilador.InsertaConst((yyvsp[(1) - (1)].id), TIPO_INT); }
+    break;
+
+  case 105:
+
+/* Line 1806 of yacc.c  */
+#line 247 "sintaxis.y"
+    { compilador.InsertaConst((yyvsp[(1) - (1)].id), TIPO_FLOAT); }
     break;
 
 
 
 /* Line 1806 of yacc.c  */
-#line 1850 "y.tab.c"
+#line 1865 "y.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2077,7 +2092,7 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 271 "sintaxis.y"
+#line 261 "sintaxis.y"
 
 
 void yyerror (char const *s){
