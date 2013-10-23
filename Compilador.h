@@ -8,6 +8,7 @@
 #include <stack>
 #include "Funcion.h"
 #include "Variable.h"
+#include "Cuadruplo.h"
 #include "y.tab.h"
 #include "gml.tipos.h"
 #include "gml.operadores.h"

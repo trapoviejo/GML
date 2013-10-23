@@ -30,6 +30,15 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
+/* "%code requires" blocks.  */
+
+/* Line 2068 of yacc.c  */
+#line 21 "sintaxis.y"
+ #include "gml.operadores.h" 
+
+
+/* Line 2068 of yacc.c  */
+#line 42 "y.tab.h"
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -149,16 +158,17 @@ typedef union YYSTYPE
 {
 
 /* Line 2068 of yacc.c  */
-#line 20 "sintaxis.y"
+#line 23 "sintaxis.y"
 
   int entero; 
   float flotante;
   char* id;
+  int op;
 
 
 
 /* Line 2068 of yacc.c  */
-#line 162 "y.tab.h"
+#line 172 "y.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

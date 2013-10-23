@@ -74,6 +74,7 @@ bool Compilador::InsertaOperando(string nombre, int tipo, int clase){
     Variable operando;
     switch (clase) {
         case GML_ES_VARIABLE:
+        {
             //Checa por existencia
             if(!ExisteVar(nombre)){
                 return false;
@@ -82,35 +83,42 @@ bool Compilador::InsertaOperando(string nombre, int tipo, int clase){
             operando = GetVar(nombre);
             
             break;
+        }
         
         case GML_ES_CONSTANTE:
+        {
             //Inserta la constante
             InsertaConst(nombre, tipo);
             //Obtiene operando apropiado
             operando = tablaConsts[nombre];
             
             break;
+        }
         
         case GML_ES_TEMPORAL:
+        {
             //Determina donde poner la var temporal
             //TODO
             int dirAsignada = 5;
             //Crea una variable temporal
-            operando(nombre, tipo, dirAsignada);
+            Variable operando(nombre, tipo, dirAsignada);
             break;
+        }
         
         default:
+        {
             return false; //Debe ser de una de las clases anteriores
             break;
+        }
     }
     
     pilaOperandos.push(operando);
     return true;
 }
 
-bool Compilador::InsertaOperador(int op){
+void Compilador::InsertaOperador(int op){
     pilaOperadores.push(op);
-    return true;
+    //return true;
 }
 
 bool Compilador::ChecaPrioridad(int actual){
@@ -131,12 +139,12 @@ bool Compilador::GeneraCuadruplo(){
     pilaOperandos.pop();
     Variable operando1 = pilaOperandos.top();
     pilaOperandos.pop();
-    Variable operador = pilaOperador.top();
-    pilaOperador.pop();
+    int operador = pilaOperadores.top();
+    pilaOperadores.pop();
     /*if(SonCompatibles()){
     }*/
-    cout << operador << " " << operando1.direccion << " " << operando2.direccion << " 5" endl;
-    pilaOperandos.push(5);
+    cout << operador << " " << operando1.direccion << " " << operando2.direccion << " 5" << endl;
+    pilaOperandos.push(Variable("hola",5));
     return true;
 }
 
