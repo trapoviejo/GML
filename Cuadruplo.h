@@ -16,7 +16,7 @@ public:
     Cuadruplo(int oper, int op1, int op2, int temp);
     ~Cuadruplo();
     bool InsertaCuadruplo(Cuadruplo quad);
-    Cuadruplo GetCuadruplo();
+    Cuadruplo GetCuadruplo(int index);
     int oper;
     int op1;
     int op2;

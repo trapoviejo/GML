@@ -30,9 +30,10 @@ Cuadruplo::~Cuadruplo() {
 }
 
 bool Cuadruplo::InsertaCuadruplo(Cuadruplo quad){
-    //TODO
+    vectorCuadruplos.push_back(quad);
+    return true;
 }
 
-Cuadruplo Cuadruplo::GetCuadruplo(){
-    //TODO
+Cuadruplo Cuadruplo::GetCuadruplo(int index){
+    return vectorCuadruplos.at(index);
 }
