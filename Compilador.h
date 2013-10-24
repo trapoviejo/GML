@@ -30,12 +30,13 @@ public:
     void ImprimeTablaConsts();
     void ImprimePilaOperandos();
     void InicializaMemoria();
+    void InicializaCubo();
     void InsertaConst(string constante, int tipo);
     void InsertaOperador(int op);
     bool ChecaPrioridad(int actual);
     bool GeneraCuadruplo();
     bool EsScopeGlobal();
-    bool SonCompatibles();
+    int TipoResultante(int oper, int op1, int op2);
     string nomPrograma;
     string funcionActual;
     int tipoActual;
@@ -44,6 +45,7 @@ public:
     stack<int> pilaOperadores;
     bool InsertaOperando(string nombre, int tipo, int clase);
     Variable GetVar(string nombre);
+    int cuboSemantico[16][7][7];
 private:
     unordered_map<string, Funcion> tablaFuncs;
     unordered_map<string, Variable> tablaConsts;
