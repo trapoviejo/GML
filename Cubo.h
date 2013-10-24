@@ -7,7 +7,7 @@ class Cubo {
 public:
 
 
-    string verificaOperacion(int op1, int op2, int oper);        
+    string verificaOperacion(int oper, int op1, int op2);        
     
 
     string cubo[16][7][7]; 

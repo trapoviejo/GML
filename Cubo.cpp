@@ -114,9 +114,9 @@ cubo = {
    {TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID},  
    {TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID}}     //_y
    }
-    verificaOperacion(op1,   op2,   oper){
-        if(return cubo[op1 - 10000][op2 - 10000][oper - 20000]!="TIPO_VOID"){
-            return cubo[op1 - 10000][op2 - 10000][oper - 20000];
+    verificaOperacion(oper,   op1,   op2){
+        if(return cubo[oper - 10000][op1 - 10000][op2 - 20000]!="TIPO_VOID"){
+            return cubo[oper - 10000][op1 - 10000][op2 - 20000];
         }
         else{
             "error";

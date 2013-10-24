@@ -12,6 +12,7 @@
 #include "y.tab.h"
 #include "gml.tipos.h"
 #include "gml.operadores.h"
+#include "Cubo.h"
 
 int yyparse();
 
@@ -33,6 +34,8 @@ public:
     void InsertaOperador(int op);
     bool ChecaPrioridad(int actual);
     bool GeneraCuadruplo();
+    bool EsScopeGlobal();
+    bool SonCompatibles();
     string nomPrograma;
     string funcionActual;
     int tipoActual;

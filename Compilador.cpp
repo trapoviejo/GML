@@ -16,7 +16,7 @@ void Compilador::InicializaMemoria(){
     */
 
     //Globales, variables
-    rangoMemoria[0][0][0] = 0;      //int
+    rangoMemoria[0][0][0] = 100;      //int
     rangoMemoria[0][0][1] = 1000;   //float
     rangoMemoria[0][0][2] = 2000;   //pos
     rangoMemoria[0][0][3] = 3000;   //string
@@ -70,6 +70,12 @@ void Compilador::InicializaMemoria(){
     rangoMemoria[1][2][6] = 41000;  //list
 }
 
+bool Compilador::EsScopeGlobal(){
+    if(funcionActual==nomPrograma)
+        return true;
+       else return false;
+}
+
 bool Compilador::InsertaOperando(string nombre, int tipo, int clase){
     Variable operando;
     switch (clase) {
@@ -97,11 +103,19 @@ bool Compilador::InsertaOperando(string nombre, int tipo, int clase){
         
         case GML_ES_TEMPORAL:
         {
-            //Determina donde poner la var temporal
-            //TODO
-            int dirAsignada = 5;
-            //Crea una variable temporal
-            Variable operando(nombre, tipo, dirAsignada);
+            int scope;
+            if(EsScopeGlobal()){
+                scope = 0;
+            }
+            else
+            {
+                scope = 1;
+            }
+            operando.nombre = nombre;
+            operando.tipo = tipo;
+            operando.direccion = rangoMemoria[scope][1][tipo-10000];
+            rangoMemoria[scope][1][tipo-10000]++;
+            
             break;
         }
         
@@ -134,6 +148,10 @@ bool Compilador::ChecaPrioridad(int actual){
     return true;
 }
 
+bool Compilador::SonCompatibles(){
+
+}
+
 bool Compilador::GeneraCuadruplo(){
     Variable operando2 = pilaOperandos.top();
     pilaOperandos.pop();
@@ -141,12 +159,13 @@ bool Compilador::GeneraCuadruplo(){
     pilaOperandos.pop();
     int operador = pilaOperadores.top();
     pilaOperadores.pop();
-    /*if(SonCompatibles()){
-    }*/
+    if(SonCompatibles()){
+    }
     cout << operador << " " << operando1.direccion << " " << operando2.direccion << " 5" << endl;
-    pilaOperandos.push(Variable("hola",5));
+    InsertaOperando("temp", 10000, GML_ES_TEMPORAL);
     return true;
 }
+
 
 Variable Compilador::GetVar(string nomVar) {
     Variable var;
