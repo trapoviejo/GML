@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <unordered_map>
 #include <stack>
+#include <initializer_list>
 #include "Funcion.h"
 #include "Variable.h"
 #include "Cuadruplo.h"
@@ -45,7 +46,6 @@ public:
     stack<int> pilaOperadores;
     bool InsertaOperando(string nombre, int tipo, int clase);
     Variable GetVar(string nombre);
-    int cuboSemantico[16][7][7];
 private:
     unordered_map<string, Funcion> tablaFuncs;
     unordered_map<string, Variable> tablaConsts;

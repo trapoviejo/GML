@@ -1,17 +1,6 @@
 #include "Compilador.h"
 
-Compilador::Compilador(){
-    InicializaMemoria();
-    InicializaCubo();
-}
-
-Compilador::~Compilador() {
-    //TODO
-}
-
-void Compilador::InicializaCubo(){
-cuboSemantico = {
-
+int cuboSemantico[16][7][7] = {
   {{TIPO_VOID,    TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID},  
    {TIPO_VOID,    TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID},  
    {TIPO_VOID,    TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID},  
@@ -123,7 +112,19 @@ cuboSemantico = {
    {TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID},  
    {TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID},  
    {TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID}}     //_y
-   }
+   };
+
+Compilador::Compilador(){
+    InicializaMemoria();
+    InicializaCubo();
+}
+
+Compilador::~Compilador() {
+    //TODO
+}
+
+void Compilador::InicializaCubo(){
+
 }
 
 void Compilador::InicializaMemoria(){
@@ -264,7 +265,7 @@ bool Compilador::ChecaPrioridad(int actual){
 }
 
 int Compilador::TipoResultante(int oper, int op1, int op2){
-    return cubo[oper - 20000][op1 - 10000][op2 - 10000];
+    return cuboSemantico[oper - 20000][op1 - 10000][op2 - 10000];
 }
 
 bool Compilador::GeneraCuadruplo(){
