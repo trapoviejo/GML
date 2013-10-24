@@ -251,9 +251,22 @@ void Compilador::InsertaOperador(int op){
     //return true;
 }
 
+void Compilador::PonFondoFalso(){
+    pilaOperadores.push(GML_FONDO_FALSO);
+}
+
+void Compilador::QuitaFondoFalso(){
+    
+    if (pilaOperadores.top() != GML_FONDO_FALSO){
+        cout << "MEGA ERROR" << endl;
+    }
+    
+    pilaOperadores.pop();
+}
+
 bool Compilador::ChecaPrioridad(int actual){
-    if(pilaOperadores.empty()){
-        return false; //No genero cuadruplo si no hay operador pendiente!
+    if(pilaOperadores.empty() || pilaOperadores.top() == GML_FONDO_FALSO){
+        return false; //No genero cuadruplo si no hay operador pendiente! (dentro del parentesis si aplica)
     }
     int pendiente = pilaOperadores.top();
     if(pendiente < actual){

@@ -263,7 +263,7 @@ factor2:	  operadorfactor
 ;
 operadorfactor: X | Y ;
 
-obtenerxy:	  LEFTPARENTHESIS expresion RIGHTPARENTHESIS
+obtenerxy:	  LEFTPARENTHESIS { compilador.PonFondoFalso(); } expresion RIGHTPARENTHESIS { compilador.QuitaFondoFalso(); }
 			| PLUS varcte
 			| MINUS varcte
 			| varcte
