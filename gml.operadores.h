@@ -39,4 +39,6 @@ enum gml_operador
 #define OP_X 20012
 #define OP_Y 20013
 
+#define GML_FONDO_FALSO 9999
+
 #endif

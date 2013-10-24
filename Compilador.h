@@ -36,6 +36,8 @@ public:
     void InsertaOperador(int op);
     bool ChecaPrioridad(int actual);
     bool GeneraCuadruplo();
+    void PonFondoFalso();
+    void QuitaFondoFalso();
     bool EsScopeGlobal();
     int TipoResultante(int oper, int op1, int op2);
     string nomPrograma;
