@@ -250,7 +250,6 @@ void Compilador::InsertaOperador(int op){
     pilaOperadores.push(op);
     //return true;
 }
-
 void Compilador::PonFondoFalso(){
     pilaOperadores.push(GML_FONDO_FALSO);
 }
@@ -303,6 +302,7 @@ bool Compilador::GeneraCuadruplo(){
     
     return true;
 }
+
 
 
 Variable Compilador::GetVar(string nomVar) {

@@ -120,7 +120,11 @@ e6: estatuto e6 | /*null*/ ;
 estatuto: asignacion|condicion|escritura|ciclowhile|ciclodowhile|regreso
 |llamadafuncion|agregar|remover
 ;
-asignacion: porasignar e7 e8 ;
+asignacion: porasignar e7 e8 
+                            {
+                               // bool sePudo = generaCuadruplo();
+                            }
+                            ;
 
 porasignar:     ID porasignar2
                 {
@@ -128,6 +132,23 @@ porasignar:     ID porasignar2
                         yyerror("No existe la variable utilizada");
                         YYERROR;
                     }
+                    
+                    /*
+                    if(!compilador.ExisteVar($1)){
+                        yyerror("No existe la variable utilizada");
+                        YYERROR;
+                    }else{
+                        Variable resultado = compilador.GetVar($1);
+                        Variable operando1 = compilador.pilaOperandos.top();
+                        compilador.pilaOperandos.pop();
+                        if(resultado.tipo != operando1.tipo){
+                            yyerror("No concuerdan los tipos para asignacion");
+                            YYERROR;
+                        }else{
+                            Cuadruplo quad = Cuadruplo(OP_ASIGNACION, operando1, resultado);
+                            compilador.vectorCuadruplos.push_back(quad);
+                        }
+                    }*/
                 }
 			|   elemento porasignar2
             ;
