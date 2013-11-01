@@ -297,12 +297,31 @@ bool Compilador::GeneraCuadruplo(){
     
     InsertaOperando("temp", tipoResultante, GML_ES_TEMPORAL);
     Variable resultado = pilaOperandos.top(); //Solo lo vemos (para la direccion), no lo quitamos!
-    cout << operador << " " << operando1.nombre << " " << operando2.nombre << " " << resultado.nombre;
-    cout << "(" << " " << operando1.direccion << " " << operando2.direccion << " " << resultado.direccion << ")" << endl;
+    Cuadruplo quad = Cuadruplo(operador, operando1.direccion, operando2.direccion, resultado.direccion);
+    vectorCuadruplo.push_back(quad);
+    //cout << operador << " " << operando1.nombre << " " << operando2.nombre << " " << resultado.nombre;
+    //cout << " (" << operando1.direccion << " " << operando2.direccion << " " << resultado.direccion << ")" << endl;
     
     return true;
 }
 
+bool Compilador::GeneraCuadruploGotof(){
+    //Revisar semantica (debe ser booleano)
+    Variable operador = pilaOperadores.top();
+    pilaOperadores.pop();
+    if(operador.tipo != TIPO_BOOLEAN){
+        return false;
+    }
+    
+    //Generar cuadruplo
+    Cuadruplo quad = Cuadruplo(OP_GOTOF, operador.direccion, GML_SALTO_PENDIENTE);
+    vectorCuadruplos.push_back(quad);
+    
+    //Guardar direccion para actualizar salto luego
+    pilaSaltos.push(vectorCuadruplos.size()-1);
+    
+    return true;
+}
 
 
 Variable Compilador::GetVar(string nomVar) {
@@ -375,6 +394,7 @@ bool Compilador::ExisteVar(string nomVar) {
 void Compilador::ImprimeTablaFuncs(bool conVars) {
     Funcion estaFunc;
     Variable estaVar;
+    cout << endl << "Tabla de funciones con variables:" << endl;
     for ( auto it = tablaFuncs.begin(); it != tablaFuncs.end(); ++it ){
         string key = it->first;
         estaFunc = tablaFuncs[key];
@@ -391,6 +411,7 @@ void Compilador::ImprimeTablaFuncs(bool conVars) {
 }
 
 void Compilador::ImprimeTablaConsts(){
+    cout << endl << "Tabla de constantes:" << endl;
     Variable estaConst;
     for ( auto it = tablaConsts.begin(); it != tablaConsts.end(); ++it ){
         string key = it->first;
@@ -400,11 +421,20 @@ void Compilador::ImprimeTablaConsts(){
 }
 
 void Compilador::ImprimePilaOperandos(){
+    cout << endl << "Pila de operandos:" << endl;
     Variable esteOperando;
     while( ! pilaOperandos.empty() ){
         esteOperando = pilaOperandos.top();
         pilaOperandos.pop();
         cout << "Operando: " << esteOperando.nombre << ", tipo: " << esteOperando.tipo << endl;
+    }
+}
+
+void Compilador::ImprimeCuadruplos(){
+    cout << endl << "Cuadruplos generados:" << endl;
+    Cuadruplo esteCuadruplo;
+    for (int i = 0; i < vectorCuadruplos.size(); i++){
+        cout << i << ": " << operador << "\t" << operando1.direccion << "\t" << operando2.direccion << "\t" << resultado.direccion << endl;
     }
 }
 
@@ -414,12 +444,10 @@ int main(void){
 
     if (yyparse()==0){
         cout << "Apropiado!" << endl;
-        cout << endl << "Tabla de funciones con variables:" << endl;
-        compilador.ImprimeTablaFuncs(true);
-        cout << endl << "Tabla de constantes:" << endl;
-        compilador.ImprimeTablaConsts();
-        cout << endl << "Pila de operandos:" << endl;
-        compilador.ImprimePilaOperandos();
+        //compilador.ImprimeTablaFuncs(true);
+        //compilador.ImprimeTablaConsts();
+        //compilador.ImprimePilaOperandos();
+        compilador.ImprimeCuadruplos();
     }
     else
         cout << "MAAAAAL!" << endl;

@@ -19,7 +19,11 @@ enum gml_operador
     OP_DIVISION = 20011,
     OP_X = 20012,
     OP_Y = 20013,
+<<<<<<< HEAD
     OP_ASIGNACION = 20014
+=======
+    OP_ASIGNACION = 21000
+>>>>>>> Inicios de IF
 };
 
 }
@@ -40,6 +44,10 @@ enum gml_operador
 #define OP_X 20012
 #define OP_Y 20013
 #define OP_ASIGNACION 20014
+
+#define OP_ASIGNACION 21000
+
+#define GML_SALTO_PENDIENTE -1234
 
 #define GML_FONDO_FALSO 9999
 

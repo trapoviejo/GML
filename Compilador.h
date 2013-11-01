@@ -14,7 +14,6 @@
 #include "y.tab.h"
 #include "gml.tipos.h"
 #include "gml.operadores.h"
-#include "Cubo.h"
 
 int yyparse();
 
@@ -48,6 +47,8 @@ public:
     std::vector<Cuadruplo> vectorCuadruplos;
     stack<Variable> pilaOperandos;
     stack<int> pilaOperadores;
+    stack<int> pilaSaltos;
+    vector<Cuadruplo> vectorCuadruplos;
     bool InsertaOperando(string nombre, int tipo, int clase);
     Variable GetVar(string nombre);
 private:

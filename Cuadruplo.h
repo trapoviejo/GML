@@ -12,6 +12,7 @@ using namespace std;
 class Cuadruplo {
 public:
     Cuadruplo();
+<<<<<<< HEAD
     //Cuadruplo(int oper, int numSalto);    
     Cuadruplo(int oper, Variable temp, Variable resultado);
     Cuadruplo(int oper, Variable op1, Variable op2, Variable temp);
@@ -24,6 +25,18 @@ public:
     Variable temp;
     int numSalto;
     
+=======
+    Cuadruplo(int operador, int operando1, int resultado);    
+    Cuadruplo(int operador, int resultado);
+    Cuadruplo(int operador, int operando1, int operando2, int resultado);
+    ~Cuadruplo();
+    ActualizaPendiente(int salto);
+private:
+    int operador;
+    int operando1;
+    int operando2;
+    int resultado;
+>>>>>>> Inicios de IF
 };
 
 #endif
