@@ -128,12 +128,12 @@ asignacion: porasignar e7 e8
 
 porasignar:     ID porasignar2
                 {
-                    if(!compilador.ExisteVar($1)){
+                    /*if(!compilador.ExisteVar($1)){
                         yyerror("No existe la variable utilizada");
                         YYERROR;
                     }
+                    */
                     
-                    /*
                     if(!compilador.ExisteVar($1)){
                         yyerror("No existe la variable utilizada");
                         YYERROR;
@@ -148,7 +148,7 @@ porasignar:     ID porasignar2
                             Cuadruplo quad = Cuadruplo(OP_ASIGNACION, operando1, resultado);
                             compilador.vectorCuadruplos.push_back(quad);
                         }
-                    }*/
+                    }
                 }
 			|   elemento porasignar2
             ;

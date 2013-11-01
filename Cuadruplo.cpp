@@ -12,13 +12,13 @@ Cuadruplo::Cuadruplo(int oper, int numSalto) {
     this->numSalto = numSalto;
 }
 
-Cuadruplo::Cuadruplo(int oper, int temp, int numSalto){
+Cuadruplo::Cuadruplo(int oper, Variable temp, Variable resultado){
     this->oper = oper;
     this->temp = temp;
-    this->numSalto = numSalto;
+    this->resultado = resultado;
 }
 
-Cuadruplo::Cuadruplo(int oper, int op1, int op2, int temp){
+Cuadruplo::Cuadruplo(int oper, Variable op1, Variable op2, Variable temp){
     this->oper = oper;
     this->op1 = op1;
     this->op2 = op2;

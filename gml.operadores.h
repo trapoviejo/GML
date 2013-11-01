@@ -18,7 +18,8 @@ enum gml_operador
     OP_MULTIPLICACION = 20010,
     OP_DIVISION = 20011,
     OP_X = 20012,
-    OP_Y = 20013
+    OP_Y = 20013,
+    OP_ASIGNACION = 20014
 };
 
 }
@@ -38,6 +39,7 @@ enum gml_operador
 #define OP_DIVISION 20011
 #define OP_X 20012
 #define OP_Y 20013
+#define OP_ASIGNACION 20014
 
 #define GML_FONDO_FALSO 9999
 

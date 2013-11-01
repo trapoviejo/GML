@@ -1,28 +1,28 @@
 #ifndef GML_CUADRUPLO
 #define GML_CUADRUPLO
 
+#include <iostream>
+#include <vector>
 #include "Variable.h"
 #include "gml.tipos.h"
 #include "gml.operadores.h"
-#include <vector>
 
 using namespace std;
 
 class Cuadruplo {
 public:
     Cuadruplo();
-    Cuadruplo(int oper, int numSalto);    
-    Cuadruplo(int oper, int temp, int numSalto);
-    Cuadruplo(int oper, int op1, int op2, int temp);
+    //Cuadruplo(int oper, int numSalto);    
+    Cuadruplo(int oper, Variable temp, Variable resultado);
+    Cuadruplo(int oper, Variable op1, Variable op2, Variable temp);
     ~Cuadruplo();
     bool InsertaCuadruplo(Cuadruplo quad);
     Cuadruplo GetCuadruplo(int index);
     int oper;
-    int op1;
-    int op2;
-    int temp;
+    Variable op1;
+    Variable op2;
+    Variable temp;
     int numSalto;
-    std::vector<Cuadruplo> vectorCuadruplos;
     
 };
 

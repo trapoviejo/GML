@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <unordered_map>
 #include <stack>
+#include <vector>
 #include <initializer_list>
 #include "Funcion.h"
 #include "Variable.h"
@@ -44,6 +45,7 @@ public:
     string funcionActual;
     int tipoActual;
     int rangoMemoria[2][3][7];
+    std::vector<Cuadruplo> vectorCuadruplos;
     stack<Variable> pilaOperandos;
     stack<int> pilaOperadores;
     bool InsertaOperando(string nombre, int tipo, int clase);
