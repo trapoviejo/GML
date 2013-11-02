@@ -9,26 +9,27 @@
     #include "Funcion.h"
     #include "Variable.h"
     #include "gml.tipos.h"
+    #include "gml.operadores.h"
+    #include "Compilador.h"
 
     using namespace std;
 
- 
-    extern string nomPrograma;
-    extern unordered_map<string, Funcion> tablaFuncs;
-    extern int tipoActual; 
-    extern string nomFuncion;
+    extern Compilador compilador;
     
 %}
+
+%code requires { #include "gml.operadores.h" }
 
 %union {
   int entero; 
   float flotante;
   char* id;
+  int op;
 };
 
-%type<entero> CTEINT tipoovoid tipo tiposimple
-%type<flotante> CTEFLOAT
-%type<id> ID
+%type<entero> tipoovoid tipo tiposimple
+%type<id> ID CTEINT CTEFLOAT porasignar
+%type<op> PLUS MINUS MULTIPLICATION DIVISION OR AND EQUALS EQUALMORETHAN EQUALLESSTHAN NOT LESSTHAN MORETHAN X Y operadorexpresion operadorexp operadortermino operadorfactor
 
 %token ID CTESTRING CTEINT CTEFLOAT CTEPOS TRUE FALSE PROGRAM VARS
 MAPSIZE DO WHILE IF ELSE RETURN DRAW VOID INT FLOAT POS BOOLEAN STRING 
@@ -41,21 +42,16 @@ LEFTBRACKET RIGHTBRACKET
 %%
 programa:   PROGRAM ID
             {
-                nomPrograma = $2;
-                Funcion funcionPrograma(nomPrograma, TIPO_PROGRAMA);
-                std::pair<std::string,Funcion> par (nomPrograma, funcionPrograma);
-                tablaFuncs.insert(par);
+                compilador.nomPrograma = $2;
+                compilador.InsertaFunc($2, TIPO_PROGRAMA);
             }
             SEMICOLON variables mapa funcion bloque
 ;
 
 variables:      VARS tipo COLON ID
                 {
-                    tipoActual = $2;
-                    string nomID = $4;
-                    Variable nuevaVar(nomID, tipoActual);
-                    bool yaExistia = tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
-                    if(yaExistia){
+                    compilador.tipoActual = $2;
+                    if(!compilador.InsertaVarEnFuncActual($4, $2)){
                         yyerror("Variable declarada dos veces.");
                         YYERROR;
                     }
@@ -65,10 +61,7 @@ variables:      VARS tipo COLON ID
 ;
 listaids:       COMMA ID
                 {
-                    string nomID = $2;
-                    Variable nuevaVar(nomID, tipoActual);
-                    bool yaExistia = tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
-                    if(yaExistia){
+                    if(!compilador.InsertaVarEnFuncActual($2, compilador.tipoActual)){
                         yyerror("Variable declarada dos veces.");
                         YYERROR;
                     }
@@ -78,11 +71,8 @@ listaids:       COMMA ID
 ;
 varsotrotipo:   tipo COLON ID
                 {
-                    tipoActual = $1;
-                    string nomID = $3;
-                    Variable nuevaVar(nomID, tipoActual);
-                    bool yaExistia = tablaFuncs[nomPrograma].InsertaVar(nuevaVar);
-                    if(yaExistia){
+                    compilador.tipoActual = $1;
+                    if(!compilador.InsertaVarEnFuncActual($3, $1)){
                         yyerror("Variable declarada dos veces.");
                         YYERROR;
                     }
@@ -93,11 +83,11 @@ varsotrotipo:   tipo COLON ID
 
 funcion:        tipoovoid ID 
                 {
-                    int tipo = $1;
-                    nomFuncion = $2;
-                    Funcion nuevaFuncion(nomFuncion, tipo);
-                    std::pair<std::string,Funcion> par (nomFuncion, nuevaFuncion);
-                    tablaFuncs.insert(par);
+                    if(!compilador.InsertaFunc($2, $1)){
+                        //No inserto la funcion porque ya existia, asi que hay error
+                        yyerror("Funcion declarada dos veces");
+                        YYERROR;
+                    }
                 }
                 LEFTPARENTHESIS parametros RIGHTPARENTHESIS bloque funcion
             |   /*null*/
@@ -109,12 +99,8 @@ tipoovoid:      tipo    { $$ = $1; }
             
 parametros: 	tipo ID
                 {
-                    int tipo = $1;
-                    string nomVariable = $2;
-                    Variable nuevaVariableLocal(nomVariable, tipo);
-                    bool yaExistia = tablaFuncs[nomFuncion].InsertaVar(nuevaVariableLocal);
-                    if(yaExistia){
-                        yyerror("Variable local declarada dos veces.");
+                    if(!compilador.InsertaVarEnFuncActual($2, $1)){
+                        yyerror("Variable declarada dos veces.");
                         YYERROR;
                     }
                 }
@@ -134,48 +120,114 @@ e6: estatuto e6 | /*null*/ ;
 estatuto: asignacion|condicion|escritura|ciclowhile|ciclodowhile|regreso
 |llamadafuncion|agregar|remover
 ;
-asignacion: porasignar e7 e8 ;
-porasignar:		  ID porasignar2
-				| elemento porasignar2
+asignacion:     porasignar signo loasignado 
+                {
+                    if(!compilador.GeneraCuadruploAsignacion($1)){
+                        yyerror("No concuerdan los tipos para asignacion");
+                        YYERROR;
+                    }
+                }
 ;
+
+porasignar:     ID porasignar2
+                {
+                    $$ = $1;
+                    if(!compilador.ExisteVar($1)){
+                        yyerror("No existe la variable utilizada");
+                        YYERROR;
+                    }
+                }
+			|   elemento porasignar2
+            ;
+
 porasignar2:	  X
 				| Y
 				| /*vacio*/
 ;
-e7: SIGN | AT ;
-e8: expresion SEMICOLON | llamadafuncion | entidad SEMICOLON
+signo: SIGN | AT ;
+loasignado: expresion SEMICOLON | llamadafuncion | entidad SEMICOLON
 ;
 escritura: DRAW LEFTPARENTHESIS e9 RIGHTPARENTHESIS SEMICOLON
 ;
 e9: entidad | ID ; 
 
-ciclowhile: WHILE LEFTPARENTHESIS expresion RIGHTPARENTHESIS bloque ;
+ciclowhile:     WHILE
+                {
+                    compilador.pilaSaltos.push(compilador.vectorCuadruplos.size());
+                }                
+                LEFTPARENTHESIS expresion RIGHTPARENTHESIS
+                {
+                    if(!compilador.GeneraCuadruploGotof()){
+                        yyerror("El argumento de while debe ser booleano");
+                        YYERROR;
+                    }
+                }
+                bloque
+                {
+                    int porActualizar = compilador.pilaSaltos.top();
+                    compilador.pilaSaltos.pop();
+                    int inicioExpresion = compilador.pilaSaltos.top();
+                    compilador.pilaSaltos.pop();
+                    Cuadruplo quad = Cuadruplo(OP_GOTO, inicioExpresion);
+                    compilador.vectorCuadruplos.push_back(quad);
+                    compilador.vectorCuadruplos[porActualizar].resultado = compilador.vectorCuadruplos.size();
+                }
+;
 
-ciclodowhile: DO bloque WHILE LEFTPARENTHESIS expresion 
-RIGHTPARENTHESIS SEMICOLON;
+ciclodowhile:   DO
+                {
+                    compilador.pilaSaltos.push(compilador.vectorCuadruplos.size());
+                }
+                bloque WHILE LEFTPARENTHESIS expresion RIGHTPARENTHESIS SEMICOLON
+                {
+                    int inicioDoWhile = compilador.pilaSaltos.top();
+                    pilaSaltos.pop();
+                    int operando = compilador.pilaOperandos.top();
+                    compilador.pilaOperandos.pop();
+                    Cuadruplo quad = Cuadruplo(OP_GOTOV, operando, inicioDoWhile);
+                    compilador.vectorCuadruplos.push_back(quad);
+                }
+;
 
-condicion:			  IF LEFTPARENTHESIS expresion RIGHTPARENTHESIS bloque condicionelse
+condicion:      IF LEFTPARENTHESIS expresion RIGHTPARENTHESIS
+                {
+                    if(!compilador.GeneraCuadruploGotof()){
+                        yyerror("El argumento de if debe ser booleano");
+                        YYERROR;
+                    }
+                }
+                bloque condicionelse
+                {
+                    int pendiente = compilador.pilaSaltos.top();
+                    compilador.pilaSaltos.pop();
+                    compilador.vectorCuadruplos[pendiente].resultado = compilador.vectorCuadruplos.size();
+                }
 ;
 		
-condicionelse: 		  ELSE bloque
-					| /*vacio*/
+condicionelse:  ELSE
+                {
+                    Cuadruplo quad = Cuadruplo(OP_GOTO, GML_SALTO_PENDIENTE);
+                    compilador.vectorCuadruplos.push_back(quad);
+                    int pendiente = compilador.pilaSaltos.top();
+                    compilador.pilaSaltos.pop();
+                    compilador.vectorCuadruplos[pendiente].resultado = compilador.vectorCuadruplos.size();
+                    compilador.pilaSaltos.push(compilador.vectorCuadruplos.size()-1);
+                }
+                bloque
+
+			|   /*vacio*/
 ;
 
 llamadafuncion:		  ID LEFTPARENTHESIS
                       {
-                        string nomVar = $1;
-                                                
-                        unordered_map<string,Funcion>::const_iterator it = tablaFuncs.find(nomVar);
-                        if(it != tablaFuncs.end())
+                        if(!compilador.ExisteFunc($1))
                         {
-                           yyerror("Llamaste una funcion que no existe.");
+                           yyerror("Llamada a funcion no declarada.");
                            YYERROR;
                         }
-                        
-
                       }
                       llamadafuncion2
-;
+                ;
 llamadafuncion2:	  RIGHTPARENTHESIS SEMICOLON
 					| paramsllamada RIGHTPARENTHESIS SEMICOLON
 ;
@@ -206,66 +258,106 @@ agregar:	  ID ADD LEFTPARENTHESIS expresion RIGHTPARENTHESIS SEMICOLON
 ;
 remover:	  ID REM SEMICOLON
 ;
-expresion:	  exp expresion2
+
+expresion:      exp
+                {
+                    if(compilador.ChecaPrioridad(OP_OR)){
+                        bool sePudo = compilador.GeneraCuadruplo();
+                        if(!sePudo){
+                            yyerror("Incompatibilidad de tipos");
+                            YYERROR;
+                        }
+                    }
+                }
+                expresion2
 ;
-expresion2: 	  AND expresion
-				| OR expresion
-				| EQUALS expresion
-				| NOT expresion
-				| MORETHAN expresion
-				| LESSTHAN expresion
-				| EQUALMORETHAN expresion
-				| EQUALLESSTHAN expresion
-				| /*vacio*/
+expresion2:     operadorexpresion { compilador.InsertaOperador($1); } expresion
+            |   /*vacio*/
 ;
 
-exp:		  termino exp2
+operadorexpresion:      OR
+                    |   AND
+                    |   EQUALMORETHAN
+                    |   EQUALLESSTHAN
+                    |   MORETHAN
+                    |   LESSTHAN
+                    |   EQUALS
+                    |   NOT
 ;
-exp2:		  PLUS exp
-			| MINUS exp
+
+exp:            termino
+                {
+                    if(compilador.ChecaPrioridad(OP_SUMA)){
+                        bool sePudo = compilador.GeneraCuadruplo();
+                        if(!sePudo){
+                            yyerror("Incompatibilidad de tipos");
+                            YYERROR;
+                        }
+                    }
+                }
+                exp2
+;
+exp2:		  operadorexp { compilador.InsertaOperador($1); } exp
 			| /*vacio*/
 ;
+operadorexp:    PLUS | MINUS ;
 
-termino:	  factor termino2
+termino:	    factor
+                {
+                    if(compilador.ChecaPrioridad(OP_MULTIPLICACION)){
+                        bool sePudo = compilador.GeneraCuadruplo();
+                        if(!sePudo){
+                            yyerror("Incompatibilidad de tipos");
+                            YYERROR;
+                        }
+                    }
+                }
+                termino2
 ;
-termino2:	  MULTIPLICATION termino
-			| DIVISION termino
+termino2:	  operadortermino { compilador.InsertaOperador($1); } termino
 			| /*vacio*/
 ;
-
-entidad:	  ENTITY LEFTPARENTHESIS expresion COMMA SPRITE entidad2 
-;
-entidad2:	  CTESTRING COMMA expresion RIGHTPARENTHESIS
-			| ID COMMA expresion RIGHTPARENTHESIS
-;
+operadortermino:    MULTIPLICATION | DIVISION ;
 
 factor:		  obtenerxy factor2
 ;
-factor2:	  X
-			| Y
+factor2:	  operadorfactor
 			| /*vacio*/
 ;
+operadorfactor: X | Y ;
 
-obtenerxy:	  LEFTPARENTHESIS expresion RIGHTPARENTHESIS
+obtenerxy:	  LEFTPARENTHESIS { compilador.PonFondoFalso(); } expresion RIGHTPARENTHESIS { compilador.QuitaFondoFalso(); }
 			| PLUS varcte
 			| MINUS varcte
 			| varcte
 ;
 
-varcte:		  ID
-			| CTEINT
-			| CTEFLOAT
-			| CTESTRING
-			| TRUE
-			| FALSE
-			| CTEPOS
-			| elemento
+varcte:	    ID
+            {
+                if(!compilador.InsertaOperando($1, 0, GML_ES_VARIABLE)){
+                    yyerror("No existe la variable utilizada");
+                    YYERROR;
+                }
+            }
+        |   CTEINT      { compilador.InsertaOperando($1, TIPO_INT, GML_ES_CONSTANTE); }
+        |   CTEFLOAT    { compilador.InsertaOperando($1, TIPO_FLOAT, GML_ES_CONSTANTE); }
+        |   CTESTRING   
+        |   TRUE        
+        |   FALSE       
+        |   CTEPOS
+        |   elemento
 ;
 
 elemento:	  ID COLON elemento2
 ;
 elemento2:	  CTEINT
 			| ID
+;
+
+entidad:	  ENTITY LEFTPARENTHESIS expresion COMMA SPRITE entidad2 
+;
+entidad2:	  CTESTRING COMMA expresion RIGHTPARENTHESIS
+			| ID COMMA expresion RIGHTPARENTHESIS
 ;
  
 %%

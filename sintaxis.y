@@ -28,7 +28,7 @@
 };
 
 %type<entero> tipoovoid tipo tiposimple
-%type<id> ID CTEINT CTEFLOAT
+%type<id> ID CTEINT CTEFLOAT porasignar
 %type<op> PLUS MINUS MULTIPLICATION DIVISION OR AND EQUALS EQUALMORETHAN EQUALLESSTHAN NOT LESSTHAN MORETHAN X Y operadorexpresion operadorexp operadortermino operadorfactor
 
 %token ID CTESTRING CTEINT CTEFLOAT CTEPOS TRUE FALSE PROGRAM VARS
@@ -120,34 +120,21 @@ e6: estatuto e6 | /*null*/ ;
 estatuto: asignacion|condicion|escritura|ciclowhile|ciclodowhile|regreso
 |llamadafuncion|agregar|remover
 ;
-asignacion: porasignar e7 e8 
-                            {
-                               // bool sePudo = generaCuadruplo();
-                            }
-                            ;
+asignacion:     porasignar signo loasignado 
+                {
+                    if(!compilador.GeneraCuadruploAsignacion($1)){
+                        yyerror("No concuerdan los tipos para asignacion");
+                        YYERROR;
+                    }
+                }
+;
 
 porasignar:     ID porasignar2
                 {
-                    /*if(!compilador.ExisteVar($1)){
-                        yyerror("No existe la variable utilizada");
-                        YYERROR;
-                    }
-                    */
-                    
+                    $$ = $1;
                     if(!compilador.ExisteVar($1)){
                         yyerror("No existe la variable utilizada");
                         YYERROR;
-                    }else{
-                        Variable resultado = compilador.GetVar($1);
-                        Variable operando1 = compilador.pilaOperandos.top();
-                        compilador.pilaOperandos.pop();
-                        if(resultado.tipo != operando1.tipo){
-                            yyerror("No concuerdan los tipos para asignacion");
-                            YYERROR;
-                        }else{
-                            Cuadruplo quad = Cuadruplo(OP_ASIGNACION, operando1, resultado);
-                            compilador.vectorCuadruplos.push_back(quad);
-                        }
                     }
                 }
 			|   elemento porasignar2
@@ -157,23 +144,78 @@ porasignar2:	  X
 				| Y
 				| /*vacio*/
 ;
-e7: SIGN | AT ;
-e8: expresion SEMICOLON | llamadafuncion | entidad SEMICOLON
+signo: SIGN | AT ;
+loasignado: expresion SEMICOLON | llamadafuncion | entidad SEMICOLON
 ;
 escritura: DRAW LEFTPARENTHESIS e9 RIGHTPARENTHESIS SEMICOLON
 ;
 e9: entidad | ID ; 
 
-ciclowhile: WHILE LEFTPARENTHESIS expresion RIGHTPARENTHESIS bloque ;
+ciclowhile:     WHILE
+                {
+                    compilador.pilaSaltos.push(compilador.vectorCuadruplos.size());
+                }                
+                LEFTPARENTHESIS expresion RIGHTPARENTHESIS
+                {
+                    if(!compilador.GeneraCuadruploGotof()){
+                        yyerror("El argumento de while debe ser booleano");
+                        YYERROR;
+                    }
+                }
+                bloque
+                {
+                    int porActualizar = compilador.pilaSaltos.top();
+                    compilador.pilaSaltos.pop();
+                    int inicioExpresion = compilador.pilaSaltos.top();
+                    compilador.pilaSaltos.pop();
+                    Cuadruplo quad = Cuadruplo(OP_GOTO, inicioExpresion);
+                    compilador.vectorCuadruplos.push_back(quad);
+                    compilador.vectorCuadruplos[porActualizar].resultado = compilador.vectorCuadruplos.size();
+                }
+;
 
-ciclodowhile: DO bloque WHILE LEFTPARENTHESIS expresion 
-RIGHTPARENTHESIS SEMICOLON;
+ciclodowhile:   DO
+                {
+                    compilador.pilaSaltos.push(compilador.vectorCuadruplos.size());
+                }
+                bloque WHILE LEFTPARENTHESIS expresion RIGHTPARENTHESIS SEMICOLON
+                {
+                    int inicioDoWhile = compilador.pilaSaltos.top();
+                    compilador.pilaSaltos.pop();
+                    Variable operando = compilador.pilaOperandos.top();
+                    compilador.pilaOperandos.pop();
+                    Cuadruplo quad = Cuadruplo(OP_GOTOV, operando.direccion, inicioDoWhile);
+                    compilador.vectorCuadruplos.push_back(quad);
+                }
+;
 
-condicion:			  IF LEFTPARENTHESIS expresion RIGHTPARENTHESIS bloque condicionelse
+condicion:      IF LEFTPARENTHESIS expresion RIGHTPARENTHESIS
+                {
+                    if(!compilador.GeneraCuadruploGotof()){
+                        yyerror("El argumento de if debe ser booleano");
+                        YYERROR;
+                    }
+                }
+                bloque condicionelse
+                {
+                    int pendiente = compilador.pilaSaltos.top();
+                    compilador.pilaSaltos.pop();
+                    compilador.vectorCuadruplos[pendiente].resultado = compilador.vectorCuadruplos.size();
+                }
 ;
 		
-condicionelse: 		  ELSE bloque
-					| /*vacio*/
+condicionelse:  ELSE
+                {
+                    Cuadruplo quad = Cuadruplo(OP_GOTO, GML_SALTO_PENDIENTE);
+                    compilador.vectorCuadruplos.push_back(quad);
+                    int pendiente = compilador.pilaSaltos.top();
+                    compilador.pilaSaltos.pop();
+                    compilador.vectorCuadruplos[pendiente].resultado = compilador.vectorCuadruplos.size();
+                    compilador.pilaSaltos.push(compilador.vectorCuadruplos.size()-1);
+                }
+                bloque
+
+			|   /*vacio*/
 ;
 
 llamadafuncion:		  ID LEFTPARENTHESIS

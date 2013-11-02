@@ -298,7 +298,7 @@ bool Compilador::GeneraCuadruplo(){
     InsertaOperando("temp", tipoResultante, GML_ES_TEMPORAL);
     Variable resultado = pilaOperandos.top(); //Solo lo vemos (para la direccion), no lo quitamos!
     Cuadruplo quad = Cuadruplo(operador, operando1.direccion, operando2.direccion, resultado.direccion);
-    vectorCuadruplo.push_back(quad);
+    vectorCuadruplos.push_back(quad);
     //cout << operador << " " << operando1.nombre << " " << operando2.nombre << " " << resultado.nombre;
     //cout << " (" << operando1.direccion << " " << operando2.direccion << " " << resultado.direccion << ")" << endl;
     
@@ -307,14 +307,14 @@ bool Compilador::GeneraCuadruplo(){
 
 bool Compilador::GeneraCuadruploGotof(){
     //Revisar semantica (debe ser booleano)
-    Variable operador = pilaOperadores.top();
-    pilaOperadores.pop();
-    if(operador.tipo != TIPO_BOOLEAN){
+    Variable operando = pilaOperandos.top();
+    pilaOperandos.pop();
+    if(operando.tipo != TIPO_BOOLEAN){
         return false;
     }
     
     //Generar cuadruplo
-    Cuadruplo quad = Cuadruplo(OP_GOTOF, operador.direccion, GML_SALTO_PENDIENTE);
+    Cuadruplo quad = Cuadruplo(OP_GOTOF, operando.direccion, GML_SALTO_PENDIENTE);
     vectorCuadruplos.push_back(quad);
     
     //Guardar direccion para actualizar salto luego
@@ -323,6 +323,17 @@ bool Compilador::GeneraCuadruploGotof(){
     return true;
 }
 
+bool Compilador::GeneraCuadruploAsignacion(string nomVar){
+    Variable resultado = GetVar(nomVar);
+    Variable operando1 = pilaOperandos.top();
+    pilaOperandos.pop();
+    if(resultado.tipo != operando1.tipo){
+        return false;
+    }
+    Cuadruplo quad = Cuadruplo(OP_ASIGNACION, operando1.direccion, resultado.direccion);
+    vectorCuadruplos.push_back(quad);
+    return true;
+}
 
 Variable Compilador::GetVar(string nomVar) {
     Variable var;
@@ -342,7 +353,15 @@ void Compilador::InsertaConst(string constante, int tipo){
     //Checa si existe
     unordered_map<string,Variable>::const_iterator it = tablaConsts.find(constante);
     if(it == tablaConsts.end()){
-        Variable miConst(constante, tipo);
+        int scope;
+        if(EsScopeGlobal()){
+            scope = 0;
+        }
+        else{
+            scope = 1;
+        }
+        Variable miConst(constante, tipo, rangoMemoria[scope][2][tipo-10000]);
+        rangoMemoria[scope][2][tipo-10000]++;
         std::pair<std::string,Variable> par (constante, miConst);
         tablaConsts.insert(par);
     }
@@ -416,7 +435,7 @@ void Compilador::ImprimeTablaConsts(){
     for ( auto it = tablaConsts.begin(); it != tablaConsts.end(); ++it ){
         string key = it->first;
         estaConst = tablaConsts[key];
-        cout << "Constante: " << estaConst.nombre << ", tipo: " << estaConst.tipo << endl;
+        cout << "Constante: " << estaConst.nombre << ", tipo: " << estaConst.tipo << ", dir: " << estaConst.direccion << endl;
     }
 }
 
@@ -433,8 +452,10 @@ void Compilador::ImprimePilaOperandos(){
 void Compilador::ImprimeCuadruplos(){
     cout << endl << "Cuadruplos generados:" << endl;
     Cuadruplo esteCuadruplo;
-    for (int i = 0; i < vectorCuadruplos.size(); i++){
-        cout << i << ": " << operador << "\t" << operando1.direccion << "\t" << operando2.direccion << "\t" << resultado.direccion << endl;
+    int i = 0;
+    for (std::vector<Cuadruplo>::iterator it = vectorCuadruplos.begin() ; it != vectorCuadruplos.end(); ++it){
+        cout << i << ":\t" << it->operador << "\t" << it->operando1 << "\t" << it->operando2 << "\t" << it->resultado << endl;
+        i++;
     }
 }
 
@@ -445,7 +466,7 @@ int main(void){
     if (yyparse()==0){
         cout << "Apropiado!" << endl;
         //compilador.ImprimeTablaFuncs(true);
-        //compilador.ImprimeTablaConsts();
+        compilador.ImprimeTablaConsts();
         //compilador.ImprimePilaOperandos();
         compilador.ImprimeCuadruplos();
     }

@@ -1,0 +1,16 @@
+program mijuego;
+vars int: vidas, a, b;
+	 float: puntos, total;
+	 boolean: prueba;
+
+mapsize [256,78];
+
+
+{
+    total = puntos * vidas + puntos;
+    if(total>vidas && prueba){
+	    vidas = vidas * 2;
+	}
+	total = total + total * vidas;    
+
+}

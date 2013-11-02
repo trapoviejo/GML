@@ -1,0 +1,30 @@
+program mijuego;
+vars int: vidas, a, b;
+	 float: puntos, total;
+	 boolean: prueba;
+
+mapsize [256,78];
+
+
+{
+    total = puntos * vidas + puntos;
+    if(total>vidas && prueba){
+	    vidas = vidas * 2;
+	}else{
+        prueba = vidas <= puntos;
+    }
+	total = total + total * vidas;
+    
+    while(vidas < 20){
+        vidas = vidas + 1;
+    }  
+    
+    a = 1;
+    b = 5;    
+    
+    do{
+        a = b - a*3;
+    }while(a<b);
+    
+    puntos = puntos + 10000;
+}

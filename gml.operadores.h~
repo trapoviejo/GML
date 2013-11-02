@@ -22,7 +22,7 @@ enum gml_operador
     OP_ASIGNACION = 21000,
     OP_GOTO = 21001,
     OP_GOTOF = 21002,
-    OP_GOTOV = 21003
+    OP_GOTOF = 21003
 };
 
 }

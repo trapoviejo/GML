@@ -37,5 +37,4 @@ Cuadruplo::~Cuadruplo() {
 bool Cuadruplo::ActualizaPendiente(int salto){
     cout << "holis" << endl;
     this->resultado = salto;
-    cout << resultado << endl;
 }
