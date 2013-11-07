@@ -22,7 +22,11 @@ enum gml_operador
     OP_ASIGNACION = 21000,
     OP_GOTO = 21001,
     OP_GOTOF = 21002,
-    OP_GOTOF = 21003
+    OP_GOTOV = 21003,
+    OP_ENDPROC = 21004,
+    OP_ERA = 21005,
+    OP_PARAM = 21006,
+    OP_GOSUB = 21007
 };
 
 }
@@ -46,6 +50,10 @@ enum gml_operador
 #define OP_GOTO 21001
 #define OP_GOTOF 21002
 #define OP_GOTOV 21003
+#define OP_ENDPROC 21004
+#define OP_ERA 21005
+#define OP_PARAM 21006
+#define OP_GOSUB 21007
 
 #define GML_SALTO_PENDIENTE -1234
 

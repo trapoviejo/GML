@@ -4,20 +4,26 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <vector>
 #include "Variable.h"
+#include "gml.tipos.h"
 
 using namespace std;
 
 class Funcion {
 public:
   Funcion();
-  Funcion(string name, int tipo);
+  Funcion(string nombre, int tipo);
   ~Funcion();
-  void InsertaVar(Variable var);
+  bool InsertaVar(Variable);
+  bool InsertaVar(Variable, bool);
+  bool ExisteVar(string nombre);
+  Variable GetVar(string nombre);
   string nombre;
   int tipo;
-private:
+  int direccion;
   unordered_map<string,Variable> tablaVars;
+  vector<int> params;
 };
 
 #endif

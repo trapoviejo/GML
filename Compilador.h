@@ -24,7 +24,8 @@ public:
     Compilador();
     ~Compilador();
     bool InsertaFunc(string nombre, int tipo);
-    bool InsertaVarEnFuncActual(string nombre, int tipo);
+    bool InsertaVarEnFuncActual(string, int, bool);
+    bool InsertaVarEnFuncActual(string, int);
     bool ExisteFunc(string nomFunc);
     bool ExisteVar(string nomVar);
     void ImprimeTablaFuncs(bool conVars);
@@ -43,6 +44,8 @@ public:
     string nomPrograma;
     string funcionActual;
     int tipoActual;
+    string llamadaActual;
+    int paramActual;
     int rangoMemoria[2][3][7];
     stack<Variable> pilaOperandos;
     stack<int> pilaOperadores;
@@ -54,7 +57,6 @@ public:
     bool GeneraCuadruplo();
     bool GeneraCuadruploGotof();
     bool GeneraCuadruploAsignacion(string);
-private:
     unordered_map<string, Funcion> tablaFuncs;
     unordered_map<string, Variable> tablaConsts;
 };

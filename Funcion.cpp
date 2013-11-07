@@ -3,11 +3,19 @@
 Funcion::Funcion() {
     this->nombre = "";
 	this->tipo = TIPO_VOID;
+    this->direccion = -1;
 }
 
 Funcion::Funcion(string nombre, int tipo) {
     this->nombre = nombre;
 	this->tipo = tipo;
+    this->direccion = -1;
+}
+
+Funcion::Funcion(string nombre, int tipo, int direccion) {
+    this->nombre = nombre;
+	this->tipo = tipo;
+    this->direccion = direccion;
 }
 
 Funcion::~Funcion() {
@@ -15,19 +23,16 @@ Funcion::~Funcion() {
 }
 
 bool Funcion::InsertaVar(Variable var) {
-    if(!ExisteVar(var.nombre)){
-        std::pair<std::string,Variable> par (var.nombre, var);
-        tablaVars.insert(par);
-        return true; //Inserte la variable
-    }
-    return false; //No inserte la variable
+    return InsertaVar(var, false);
 }
 
-bool Funcion::InsertaVar(string nomVar, int tipo) {
-    Variable var(nomVar, tipo);
+bool Funcion::InsertaVar(Variable var, bool esParam) {
     if(!ExisteVar(var.nombre)){
         std::pair<std::string,Variable> par (var.nombre, var);
         tablaVars.insert(par);
+        if(esParam){
+            params.push_back(var.tipo);
+        }
         return true; //Inserte la variable
     }
     return false; //No inserte la variable

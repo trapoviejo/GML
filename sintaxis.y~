@@ -44,8 +44,15 @@ programa:   PROGRAM ID
             {
                 compilador.nomPrograma = $2;
                 compilador.InsertaFunc($2, TIPO_PROGRAMA);
+                Cuadruplo quad = Cuadruplo(OP_GOTO, GML_SALTO_PENDIENTE);
+                compilador.vectorCuadruplos.push_back(quad);
             }
-            SEMICOLON variables mapa funcion bloque
+            SEMICOLON variables mapa funcion
+            {
+                //El main empieza abajo, actualiza el goto inicial
+                compilador.vectorCuadruplos[0].resultado = compilador.vectorCuadruplos.size();
+            }            
+            bloque
 ;
 
 variables:      VARS tipo COLON ID
@@ -89,7 +96,12 @@ funcion:        tipoovoid ID
                         YYERROR;
                     }
                 }
-                LEFTPARENTHESIS parametros RIGHTPARENTHESIS bloque funcion
+                LEFTPARENTHESIS parametros RIGHTPARENTHESIS bloque
+                {
+                    Cuadruplo quad = Cuadruplo(OP_ENDPROC, -1);
+                    compilador.vectorCuadruplos.push_back(quad);
+                }
+                funcion
             |   /*null*/
 ;
 
@@ -99,7 +111,7 @@ tipoovoid:      tipo    { $$ = $1; }
             
 parametros: 	tipo ID
                 {
-                    if(!compilador.InsertaVarEnFuncActual($2, $1)){
+                    if(!compilador.InsertaVarEnFuncActual($2, $1, true)){
                         yyerror("Variable declarada dos veces.");
                         YYERROR;
                     }
@@ -118,7 +130,7 @@ bloque: LEFTBRACKET estatuto e6 RIGHTBRACKET ;
 e6: estatuto e6 | /*null*/ ;
 
 estatuto: asignacion|condicion|escritura|ciclowhile|ciclodowhile|regreso
-|llamadafuncion|agregar|remover
+|llamadafuncion SEMICOLON |agregar|remover
 ;
 asignacion:     porasignar signo loasignado 
                 {
@@ -181,10 +193,10 @@ ciclodowhile:   DO
                 bloque WHILE LEFTPARENTHESIS expresion RIGHTPARENTHESIS SEMICOLON
                 {
                     int inicioDoWhile = compilador.pilaSaltos.top();
-                    pilaSaltos.pop();
-                    int operando = compilador.pilaOperandos.top();
+                    compilador.pilaSaltos.pop();
+                    Variable operando = compilador.pilaOperandos.top();
                     compilador.pilaOperandos.pop();
-                    Cuadruplo quad = Cuadruplo(OP_GOTOV, operando, inicioDoWhile);
+                    Cuadruplo quad = Cuadruplo(OP_GOTOV, operando.direccion, inicioDoWhile);
                     compilador.vectorCuadruplos.push_back(quad);
                 }
 ;
@@ -224,14 +236,36 @@ llamadafuncion:		  ID LEFTPARENTHESIS
                         {
                            yyerror("Llamada a funcion no declarada.");
                            YYERROR;
+                        }else{
+                            compilador.llamadaActual = $1;
+                            compilador.paramActual = 0;
+                            Cuadruplo quad = Cuadruplo(OP_ERA, 1234, -1, -1);
+                            compilador.vectorCuadruplos.push_back(quad);
                         }
                       }
                       llamadafuncion2
                 ;
-llamadafuncion2:	  RIGHTPARENTHESIS SEMICOLON
-					| paramsllamada RIGHTPARENTHESIS SEMICOLON
+llamadafuncion2:	  RIGHTPARENTHESIS
+                    {
+                        Cuadruplo quad = Cuadruplo(OP_GOSUB, -1, -1, compilador.tablaFuncs[compilador.llamadaActual].direccion);
+                        compilador.vectorCuadruplos.push_back(quad);
+                    }
+					| paramsllamada RIGHTPARENTHESIS
+                    {
+                        Cuadruplo quad = Cuadruplo(OP_GOSUB, -1, -1, compilador.tablaFuncs[compilador.llamadaActual].direccion);
+                        compilador.vectorCuadruplos.push_back(quad);
+                    }
 ;
-paramsllamada:		  expresion paramsllamada2
+paramsllamada:		  expresion
+                    {
+                        Variable operando = compilador.pilaOperandos.top();
+                        compilador.pilaOperandos.pop();
+                        if(operando.tipo != compilador.tablaFuncs[compilador.llamadaActual].params.at
+                        Cuadruplo quad = Cuadruplo(OP_PARAM, operando.direccion, -1, compilador.paramActual);
+                        compilador.vectorCuadruplos.push_back(quad);
+                        compilador.paramActual++;
+                    }
+                    paramsllamada2
 ;
 paramsllamada2:		  /*vacio*/
 					| COMMA paramsllamada

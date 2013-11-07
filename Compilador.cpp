@@ -374,7 +374,8 @@ bool Compilador::InsertaFunc(string nomFunc, int tipo) {
         return false; //Ya existia, por lo tanto no inserto
 
     //No existia la funcion, entonces la creo e inserto en la tabla
-    Funcion func(nomFunc, tipo);
+    int direccion = vectorCuadruplos.size();
+    Funcion func(nomFunc, tipo, direccion);
     std::pair<std::string,Funcion> par (nomFunc, func);
     tablaFuncs.insert(par);
     funcionActual = nomFunc;
@@ -386,7 +387,7 @@ bool Compilador::ExisteFunc(string nomFunc) {
     return (it != tablaFuncs.end());
 }
 
-bool Compilador::InsertaVarEnFuncActual(string nombre, int tipo) {
+bool Compilador::InsertaVarEnFuncActual(string nombre, int tipo, bool esParam) {
     int scope;
     if(funcionActual == nomPrograma){
         scope = 0; //scope global
@@ -396,7 +397,11 @@ bool Compilador::InsertaVarEnFuncActual(string nombre, int tipo) {
     int memoriaAsignada = rangoMemoria[scope][0][tipo-10000];
     rangoMemoria[scope][0][tipo-10000]++;
     Variable var(nombre, tipo, memoriaAsignada);
-    return tablaFuncs[funcionActual].InsertaVar(var);
+    return tablaFuncs[funcionActual].InsertaVar(var, esParam);
+}
+
+bool Compilador::InsertaVarEnFuncActual(string nombre, int tipo) {
+    return InsertaVarEnFuncActual(nombre, tipo, false);
 }
 
 bool Compilador::ExisteVar(string nomVar) {
@@ -417,8 +422,13 @@ void Compilador::ImprimeTablaFuncs(bool conVars) {
     for ( auto it = tablaFuncs.begin(); it != tablaFuncs.end(); ++it ){
         string key = it->first;
         estaFunc = tablaFuncs[key];
-        cout << "Funcion: " << estaFunc.nombre << ", tipo: " << estaFunc.tipo << endl;
-        
+        cout << "Funcion: " << estaFunc.nombre << ", tipo: " << estaFunc.tipo << ", direccion: " << estaFunc.direccion << endl;
+        cout << "\tParams:";
+        for (int i=0; i<estaFunc.params.size(); i++){
+            cout << " " << estaFunc.params.at(i);
+        }
+        cout << endl;
+
         if(conVars){
             for ( auto it = (estaFunc.tablaVars).begin(); it != (estaFunc.tablaVars).end(); ++it ){
                 string keyVar = it->first;
@@ -465,8 +475,8 @@ int main(void){
 
     if (yyparse()==0){
         cout << "Apropiado!" << endl;
-        //compilador.ImprimeTablaFuncs(true);
-        compilador.ImprimeTablaConsts();
+        compilador.ImprimeTablaFuncs(true);
+        //compilador.ImprimeTablaConsts();
         //compilador.ImprimePilaOperandos();
         compilador.ImprimeCuadruplos();
     }

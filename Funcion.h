@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <vector>
 #include "Variable.h"
 #include "gml.tipos.h"
 
@@ -13,14 +14,17 @@ class Funcion {
 public:
   Funcion();
   Funcion(string nombre, int tipo);
+  Funcion(string, int, int);
   ~Funcion();
-  bool InsertaVar(Variable var);
-    bool InsertaVar(string nomVar, int tipo);
+  bool InsertaVar(Variable);
+  bool InsertaVar(Variable, bool);
   bool ExisteVar(string nombre);
-    Variable GetVar(string nombre);
+  Variable GetVar(string nombre);
   string nombre;
   int tipo;
+  int direccion;
   unordered_map<string,Variable> tablaVars;
+  vector<int> params;
 };
 
 #endif
