@@ -8,6 +8,7 @@
 #include <stack>
 #include <vector>
 #include <initializer_list>
+#include <fstream>
 #include "Funcion.h"
 #include "Variable.h"
 #include "Cuadruplo.h"
@@ -32,6 +33,7 @@ public:
     void ImprimeTablaConsts();
     void ImprimePilaOperandos();
     void ImprimeCuadruplos();
+    void ImprimeNumeroConsts();
     void InicializaMemoria();
     void InicializaCubo();
     void InsertaConst(string constante, int tipo);
@@ -50,9 +52,13 @@ public:
     stack<Variable> pilaOperandos;
     stack<int> pilaOperadores;
     stack<int> pilaSaltos;
+    int ctes[7];
     vector<Cuadruplo> vectorCuadruplos;
     bool InsertaOperando(string nombre, int tipo, int clase);
     Variable GetVar(string nombre);
+    
+    ofstream cuadruplos;
+    int contFunciones;
 
     bool GeneraCuadruplo();
     bool GeneraCuadruploGotof();

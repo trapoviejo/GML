@@ -26,7 +26,9 @@ enum gml_operador
     OP_ENDPROC = 21004,
     OP_ERA = 21005,
     OP_PARAM = 21006,
-    OP_GOSUB = 21007
+    OP_GOSUB = 21007,
+    OP_RETURN = 21008,
+    OP_GETRETURN = 21008
 };
 
 }
@@ -54,6 +56,9 @@ enum gml_operador
 #define OP_ERA 21005
 #define OP_PARAM 21006
 #define OP_GOSUB 21007
+#define OP_RETURN 21008
+#define OP_GETRETURN 21009
+
 
 #define GML_SALTO_PENDIENTE -1234
 

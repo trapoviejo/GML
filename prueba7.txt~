@@ -5,17 +5,20 @@ vars int: vidas, a, b;
 
 mapsize [256,78];
 
-void algo(int x, float y){
-    puntos = x*y;
+float algo(int x, float y){
+    puntos = x*y + 5.0;
+    return puntos;
 }
 
 
 {
-    algo(a+b, b-a);
+    algo(a+b, (b-a)*1.0);
     total = puntos * vidas + puntos;
     if(total>vidas && prueba){
 	    vidas = vidas * 2;
 	}
-	total = total + total * vidas;    
+    algo(123, 2.0);
+    puntos = total +algo(a, 5.0);
+	total = algo(a, 5.0) + total * vidas;    
 
 }

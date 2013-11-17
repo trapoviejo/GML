@@ -1,5 +1,7 @@
 #include "Compilador.h"
 
+string tipos[7] = {"int", "float", "pos", "string", "boolean", "entity", "list"};
+
 int cuboSemantico[16][7][7] = {
   {{TIPO_VOID,    TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID},  
    {TIPO_VOID,    TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID,  TIPO_VOID},  
@@ -117,6 +119,8 @@ int cuboSemantico[16][7][7] = {
 Compilador::Compilador(){
     InicializaMemoria();
     InicializaCubo();
+    cuadruplos.open ("cuadruplos.txt");
+    contFunciones = 0;
 }
 
 Compilador::~Compilador() {
@@ -135,7 +139,7 @@ void Compilador::InicializaMemoria(){
     */
 
     //Globales, variables
-    rangoMemoria[0][0][0] = 100;      //int
+    rangoMemoria[0][0][0] = 100;    //int
     rangoMemoria[0][0][1] = 1000;   //float
     rangoMemoria[0][0][2] = 2000;   //pos
     rangoMemoria[0][0][3] = 3000;   //string
@@ -180,13 +184,14 @@ void Compilador::InicializaMemoria(){
     rangoMemoria[1][1][6] = 34000;  //list
 
     //Locales, constantes
-    rangoMemoria[1][2][0] = 35000;  //int
+    //YA NO DEBEN EXISTIR (TODAS LAS CONSTANTES SON GLOBALES)
+    /*rangoMemoria[1][2][0] = 35000;  //int
     rangoMemoria[1][2][1] = 36000;  //float
     rangoMemoria[1][2][2] = 37000;  //pos
     rangoMemoria[1][2][3] = 38000;  //string
     rangoMemoria[1][2][4] = 39000;  //boolean
     rangoMemoria[1][2][5] = 40000;  //entity
-    rangoMemoria[1][2][6] = 41000;  //list
+    rangoMemoria[1][2][6] = 41000;  //list*/
 }
 
 bool Compilador::EsScopeGlobal(){
@@ -229,9 +234,8 @@ bool Compilador::InsertaOperando(string nombre, int tipo, int clase){
             }
             operando.nombre = nombre;
             operando.tipo = tipo;
-            operando.direccion = rangoMemoria[scope][1][tipo-10000];
-            rangoMemoria[scope][1][tipo-10000]++;
-            
+            operando.direccion = (rangoMemoria[scope][1][tipo-10000]) + (tablaFuncs[funcionActual].temps[tipo-10000]);
+            tablaFuncs[funcionActual].temps[tipo-10000]++;
             break;
         }
         
@@ -283,8 +287,10 @@ int Compilador::TipoResultante(int oper, int op1, int op2){
 bool Compilador::GeneraCuadruplo(){
     Variable operando2 = pilaOperandos.top();
     pilaOperandos.pop();
+    //cout << "Operando: " << operando2.nombre << ", tipo: " << operando2.tipo << endl;
     Variable operando1 = pilaOperandos.top();
     pilaOperandos.pop();
+    //cout << "Operando: " << operando1.nombre << ", tipo: " << operando1.tipo << endl;
     int operador = pilaOperadores.top();
     pilaOperadores.pop();
     
@@ -309,6 +315,7 @@ bool Compilador::GeneraCuadruploGotof(){
     //Revisar semantica (debe ser booleano)
     Variable operando = pilaOperandos.top();
     pilaOperandos.pop();
+    //cout << "Operando: " << operando.nombre << ", tipo: " << operando.tipo << endl;
     if(operando.tipo != TIPO_BOOLEAN){
         return false;
     }
@@ -327,6 +334,7 @@ bool Compilador::GeneraCuadruploAsignacion(string nomVar){
     Variable resultado = GetVar(nomVar);
     Variable operando1 = pilaOperandos.top();
     pilaOperandos.pop();
+    //cout << "Operando: " << operando1.nombre << ", tipo: " << operando1.tipo << endl;
     if(resultado.tipo != operando1.tipo){
         return false;
     }
@@ -353,15 +361,9 @@ void Compilador::InsertaConst(string constante, int tipo){
     //Checa si existe
     unordered_map<string,Variable>::const_iterator it = tablaConsts.find(constante);
     if(it == tablaConsts.end()){
-        int scope;
-        if(EsScopeGlobal()){
-            scope = 0;
-        }
-        else{
-            scope = 1;
-        }
-        Variable miConst(constante, tipo, rangoMemoria[scope][2][tipo-10000]);
-        rangoMemoria[scope][2][tipo-10000]++;
+        int dir = (rangoMemoria[0][2][tipo-10000]) + (ctes[tipo-10000]);
+        Variable miConst(constante, tipo, dir);
+        ctes[tipo-10000]++;
         std::pair<std::string,Variable> par (constante, miConst);
         tablaConsts.insert(par);
     }
@@ -375,7 +377,8 @@ bool Compilador::InsertaFunc(string nomFunc, int tipo) {
 
     //No existia la funcion, entonces la creo e inserto en la tabla
     int direccion = vectorCuadruplos.size();
-    Funcion func(nomFunc, tipo, direccion);
+    Funcion func(contFunciones, nomFunc, tipo, direccion);
+    contFunciones++;
     std::pair<std::string,Funcion> par (nomFunc, func);
     tablaFuncs.insert(par);
     funcionActual = nomFunc;
@@ -394,8 +397,8 @@ bool Compilador::InsertaVarEnFuncActual(string nombre, int tipo, bool esParam) {
     }else{
         scope = 1; //scope local
     }
-    int memoriaAsignada = rangoMemoria[scope][0][tipo-10000];
-    rangoMemoria[scope][0][tipo-10000]++;
+    int memoriaAsignada = (rangoMemoria[scope][0][tipo-10000]) + (tablaFuncs[funcionActual].vars[tipo-10000]);
+    tablaFuncs[funcionActual].vars[tipo-10000]++;
     Variable var(nombre, tipo, memoriaAsignada);
     return tablaFuncs[funcionActual].InsertaVar(var, esParam);
 }
@@ -422,7 +425,8 @@ void Compilador::ImprimeTablaFuncs(bool conVars) {
     for ( auto it = tablaFuncs.begin(); it != tablaFuncs.end(); ++it ){
         string key = it->first;
         estaFunc = tablaFuncs[key];
-        cout << "Funcion: " << estaFunc.nombre << ", tipo: " << estaFunc.tipo << ", direccion: " << estaFunc.direccion << endl;
+        cout << "Funcion: " << estaFunc.nombre << " (" << estaFunc.numFuncion << "), ";
+        cout << "tipo: " << estaFunc.tipo << ", direccion: " << estaFunc.direccion << endl;
         cout << "\tParams:";
         for (int i=0; i<estaFunc.params.size(); i++){
             cout << " " << estaFunc.params.at(i);
@@ -435,6 +439,14 @@ void Compilador::ImprimeTablaFuncs(bool conVars) {
                 estaVar = estaFunc.tablaVars[keyVar];
                 cout << "\tVariable: " << estaVar.nombre << ", tipo: " << estaVar.tipo << ", direccion: " << estaVar.direccion << endl;
             }
+            
+            cout << "\t" << "Numero de variables y temporales:" << endl;
+            cuadruplos << estaFunc.numFuncion;
+            for (int i = 0; i < 7; i++){
+                cout << "\t\t" << tipos[i] << ":\t" << estaFunc.vars[i] << "\t" << estaFunc.temps[i] << endl;
+                cuadruplos << " " << estaFunc.vars[i] << " " << estaFunc.temps[i];
+            }
+            cuadruplos << endl;           
         }
     }
 }
@@ -446,7 +458,17 @@ void Compilador::ImprimeTablaConsts(){
         string key = it->first;
         estaConst = tablaConsts[key];
         cout << "Constante: " << estaConst.nombre << ", tipo: " << estaConst.tipo << ", dir: " << estaConst.direccion << endl;
+        cuadruplos << estaConst.direccion << " " << estaConst.nombre << endl;
     }
+}
+
+void Compilador::ImprimeNumeroConsts(){
+    cout << endl << "Numero de constantes:" << endl;
+    for (int i = 0; i < 7; i++){
+        cout << "\t" << tipos[i] << ":\t" << ctes[i] << endl; 
+        cuadruplos << ctes[i] << " ";
+    }
+    cuadruplos << endl;
 }
 
 void Compilador::ImprimePilaOperandos(){
@@ -466,6 +488,7 @@ void Compilador::ImprimeCuadruplos(){
     for (std::vector<Cuadruplo>::iterator it = vectorCuadruplos.begin() ; it != vectorCuadruplos.end(); ++it){
         cout << i << ":\t" << it->operador << "\t" << it->operando1 << "\t" << it->operando2 << "\t" << it->resultado << endl;
         i++;
+        cuadruplos << it->operador << " " << it->operando1 << " " << it->operando2 << " " << it->resultado << endl;
     }
 }
 
@@ -476,12 +499,15 @@ int main(void){
     if (yyparse()==0){
         cout << "Apropiado!" << endl;
         compilador.ImprimeTablaFuncs(true);
-        //compilador.ImprimeTablaConsts();
-        //compilador.ImprimePilaOperandos();
+        compilador.cuadruplos << "%" << "%" << endl;
+        compilador.ImprimeNumeroConsts();        
+        compilador.ImprimeTablaConsts();        
+        compilador.cuadruplos << "%" << "%" << endl;
         compilador.ImprimeCuadruplos();
     }
     else
         cout << "MAAAAAL!" << endl;
-
+    
+    compilador.cuadruplos.close();
     return 0;
 }

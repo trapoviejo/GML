@@ -51,6 +51,7 @@ programa:   PROGRAM ID
             {
                 //El main empieza abajo, actualiza el goto inicial
                 compilador.vectorCuadruplos[0].resultado = compilador.vectorCuadruplos.size();
+                compilador.funcionActual = compilador.nomPrograma;
             }            
             bloque
 ;
@@ -157,7 +158,7 @@ porasignar2:	  X
 				| /*vacio*/
 ;
 signo: SIGN | AT ;
-loasignado: expresion SEMICOLON | llamadafuncion | entidad SEMICOLON
+loasignado: expresion SEMICOLON | entidad SEMICOLON
 ;
 escritura: DRAW LEFTPARENTHESIS e9 RIGHTPARENTHESIS SEMICOLON
 ;
@@ -196,6 +197,7 @@ ciclodowhile:   DO
                     compilador.pilaSaltos.pop();
                     Variable operando = compilador.pilaOperandos.top();
                     compilador.pilaOperandos.pop();
+                    //cout << "Operando: " << operando.nombre << ", tipo: " << operando.tipo << endl;
                     Cuadruplo quad = Cuadruplo(OP_GOTOV, operando.direccion, inicioDoWhile);
                     compilador.vectorCuadruplos.push_back(quad);
                 }
@@ -232,6 +234,7 @@ condicionelse:  ELSE
 
 llamadafuncion:		  ID LEFTPARENTHESIS
                       {
+                        //printf("Entrando a llamadafuncion\n");
                         if(!compilador.ExisteFunc($1))
                         {
                            yyerror("Llamada a funcion no declarada.");
@@ -247,20 +250,39 @@ llamadafuncion:		  ID LEFTPARENTHESIS
                 ;
 llamadafuncion2:	  RIGHTPARENTHESIS
                     {
-                        Cuadruplo quad = Cuadruplo(OP_GOSUB, -1, -1, compilador.tablaFuncs[compilador.llamadaActual].direccion);
+                        int tipoResultante = compilador.tablaFuncs[compilador.llamadaActual].tipo;
+                        compilador.InsertaOperando("temp", tipoResultante, GML_ES_TEMPORAL);
+                        Variable resultado = compilador.pilaOperandos.top(); //Solo lo vemos (para la direccion), no lo quitamos!
+                        Cuadruplo quad = Cuadruplo(OP_GOSUB, compilador.tablaFuncs[compilador.llamadaActual].direccion, -1, resultado.direccion);
                         compilador.vectorCuadruplos.push_back(quad);
                     }
 					| paramsllamada RIGHTPARENTHESIS
                     {
-                        Cuadruplo quad = Cuadruplo(OP_GOSUB, -1, -1, compilador.tablaFuncs[compilador.llamadaActual].direccion);
+                        if(compilador.paramActual != compilador.tablaFuncs[compilador.llamadaActual].params.size()){
+                           yyerror("Cantidad de parametros en llamada es menor al esperado");
+                           YYERROR;
+                        }
+                        int tipoResultante = compilador.tablaFuncs[compilador.llamadaActual].tipo;
+                        compilador.InsertaOperando("temp", tipoResultante, GML_ES_TEMPORAL);
+                        Variable resultado = compilador.pilaOperandos.top(); //Solo lo vemos (para la direccion), no lo quitamos!
+                        Cuadruplo quad = Cuadruplo(OP_GOSUB, compilador.tablaFuncs[compilador.llamadaActual].direccion, -1, resultado.direccion);
                         compilador.vectorCuadruplos.push_back(quad);
                     }
 ;
-paramsllamada:		  expresion
+paramsllamada:      { compilador.PonFondoFalso(); }
+    		
+                      expresion
                     {
+                        compilador.QuitaFondoFalso();                        
                         Variable operando = compilador.pilaOperandos.top();
                         compilador.pilaOperandos.pop();
-                        if(operando.tipo != compilador.tablaFuncs[compilador.llamadaActual].params.at(compilador.paramActual)){
+                        //cout << "Operando: " << operando.nombre << ", tipo: " << operando.tipo << endl;
+                        //printf("operando.tipo = %d, llamadaActual.params[%d].tipo = %d\n", operando.tipo, compilador.paramActual, compilador.tablaFuncs[compilador.llamadaActual].params.at(compilador.paramActual));
+                        
+                        if(compilador.paramActual >= compilador.tablaFuncs[compilador.llamadaActual].params.size()){
+                           yyerror("Cantidad de parametros en llamada es mayor al esperado");
+                           YYERROR;
+                        }else if(operando.tipo != compilador.tablaFuncs[compilador.llamadaActual].params.at(compilador.paramActual)){
                            yyerror("Tipo de parametro no concuerda");
                            YYERROR;           
                         }else{
@@ -276,6 +298,18 @@ paramsllamada2:		  /*vacio*/
 ;
 
 regreso:	  RETURN expresion SEMICOLON
+            {
+                Variable operando = compilador.pilaOperandos.top();
+                compilador.pilaOperandos.pop();
+                //cout << "Operando: " << operando.nombre << ", tipo: " << operando.tipo << endl;
+                if(operando.tipo != compilador.tablaFuncs[compilador.funcionActual].tipo){
+                       yyerror("Tipo de retorno no concuerda con tipo de funcion.");
+                       YYERROR;               
+                }else{
+                    Cuadruplo quad = Cuadruplo(OP_RETURN, operando.direccion, -1, -1);
+                    compilador.vectorCuadruplos.push_back(quad);
+                }
+            }
 ;
 lista:		  LIST tiposimple
 ;
@@ -384,6 +418,7 @@ varcte:	    ID
         |   FALSE       
         |   CTEPOS
         |   elemento
+        |   llamadafuncion
 ;
 
 elemento:	  ID COLON elemento2
