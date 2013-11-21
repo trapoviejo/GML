@@ -607,9 +607,9 @@ static const yytype_uint16 yyrline[] =
      329,   331,   335,   334,   346,   346,   347,   350,   351,   352,
      353,   354,   355,   356,   357,   361,   360,   372,   372,   373,
      375,   375,   378,   377,   389,   389,   390,   392,   392,   394,
-     396,   397,   399,   399,   401,   401,   402,   403,   404,   407,
-     414,   415,   416,   417,   418,   419,   420,   421,   424,   426,
-     427,   430,   432,   433
+     396,   411,   413,   413,   415,   415,   416,   417,   418,   421,
+     428,   429,   430,   431,   432,   433,   434,   435,   438,   440,
+     441,   444,   446,   447
 };
 #endif
 
@@ -2089,7 +2089,7 @@ yyreduce:
                     if(compilador.ChecaPrioridad(OP_OR)){
                         bool sePudo = compilador.GeneraCuadruplo();
                         if(!sePudo){
-                            yyerror("Incompatibilidad de tipos");
+                            yyerror("Incompatibilidad de tipos en operadores booleanos");
                             YYERROR;
                         }
                     }
@@ -2111,7 +2111,7 @@ yyreduce:
                     if(compilador.ChecaPrioridad(OP_SUMA)){
                         bool sePudo = compilador.GeneraCuadruplo();
                         if(!sePudo){
-                            yyerror("Incompatibilidad de tipos");
+                            yyerror("Incompatibilidad de tipos en suma o resta");
                             YYERROR;
                         }
                     }
@@ -2133,7 +2133,7 @@ yyreduce:
                     if(compilador.ChecaPrioridad(OP_MULTIPLICACION)){
                         bool sePudo = compilador.GeneraCuadruplo();
                         if(!sePudo){
-                            yyerror("Incompatibilidad de tipos");
+                            yyerror("Incompatibilidad de tipos en multiplicacion o division");
                             YYERROR;
                         }
                     }
@@ -2147,24 +2147,44 @@ yyreduce:
     { compilador.InsertaOperador((yyvsp[(1) - (1)].op)); }
     break;
 
+  case 110:
+
+/* Line 1806 of yacc.c  */
+#line 397 "sintaxis.y"
+    {
+                Variable op = compilador.pilaOperandos.top();
+                compilador.pilaOperandos.pop();
+                int tipo = compilador.TipoResultante((yyvsp[(1) - (1)].op), op.tipo, op.tipo);
+                if(tipo == TIPO_VOID){
+                    yyerror("Incompatibilidad de tipo en _x o _y");
+                    YYERROR;
+                }else{
+                    compilador.InsertaOperando("temp", tipo, GML_ES_TEMPORAL);
+                    Variable res = compilador.pilaOperandos.top();
+                    Cuadruplo quad = Cuadruplo((yyvsp[(1) - (1)].op), op.direccion, -1, res.direccion);
+                    compilador.vectorCuadruplos.push_back(quad);
+                }
+            }
+    break;
+
   case 114:
 
 /* Line 1806 of yacc.c  */
-#line 401 "sintaxis.y"
+#line 415 "sintaxis.y"
     { compilador.PonFondoFalso(); }
     break;
 
   case 115:
 
 /* Line 1806 of yacc.c  */
-#line 401 "sintaxis.y"
+#line 415 "sintaxis.y"
     { compilador.QuitaFondoFalso(); }
     break;
 
   case 119:
 
 /* Line 1806 of yacc.c  */
-#line 408 "sintaxis.y"
+#line 422 "sintaxis.y"
     {
                 if(!compilador.InsertaOperando((yyvsp[(1) - (1)].id), 0, GML_ES_VARIABLE)){
                     yyerror("No existe la variable utilizada");
@@ -2176,21 +2196,28 @@ yyreduce:
   case 120:
 
 /* Line 1806 of yacc.c  */
-#line 414 "sintaxis.y"
+#line 428 "sintaxis.y"
     { compilador.InsertaOperando((yyvsp[(1) - (1)].id), TIPO_INT, GML_ES_CONSTANTE); }
     break;
 
   case 121:
 
 /* Line 1806 of yacc.c  */
-#line 415 "sintaxis.y"
+#line 429 "sintaxis.y"
     { compilador.InsertaOperando((yyvsp[(1) - (1)].id), TIPO_FLOAT, GML_ES_CONSTANTE); }
+    break;
+
+  case 125:
+
+/* Line 1806 of yacc.c  */
+#line 433 "sintaxis.y"
+    { compilador.InsertaOperando((yyvsp[(1) - (1)].id), TIPO_POS, GML_ES_CONSTANTE); }
     break;
 
 
 
 /* Line 1806 of yacc.c  */
-#line 2194 "y.tab.c"
+#line 2221 "y.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2421,7 +2448,7 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 436 "sintaxis.y"
+#line 450 "sintaxis.y"
 
 
 void yyerror (char const *s){

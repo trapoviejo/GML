@@ -56,7 +56,7 @@ extern int yylex();
 [\t\n]                 						
 [A-Za-z][A-Za-z0-9]*		{ printf("%s", yytext); yylval.id = strdup(yytext); return ID; }
 "\""[A-Za-z0-9:/.]*"\""		{ printf("%s", yytext); return CTESTRING; }
-"["[0-9]+","[0-9]+"]"		{ printf("%s", yytext); yylval.id = strdup(yytext); return CTEPOS; }
+"["[0-9]+","[0-9]+"]"		{ printf("%s", yytext); return CTEPOS; }
 [0-9]+"."[0-9]+				{ printf("%s", yytext); yylval.id = strdup(yytext); return CTEFLOAT; }
 [0-9]+						{ printf("%s", yytext); yylval.id = strdup(yytext); return CTEINT; }
 %%

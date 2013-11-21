@@ -1,0 +1,145 @@
+program pacman
+vars boolean: gameover, paused, hasCherry, won;
+     entity: pacman, cherry;
+     list_int: ghostdir;
+     list_entity: ghosts, walls;
+     int: facing, i, score;
+mapsize[10,10];
+
+keyboard(W){
+    facing = 1;
+}
+
+keyboard(A){
+    facing = 4;
+}
+
+keyboard(S){
+    facing = 2;
+}
+
+keyboard(D){
+    facing = 3;
+}
+
+keyboard(P){
+    if(paused){
+        paused = false;
+    }else{
+        paused = true;
+    }
+}
+
+entity updateEntityPosition(entity myEntity, int dir){
+    if(dir == 1){
+        myEntity @ myEntity + [0,1];
+    }else{
+        if(dir == 2){
+            myEntity @ myEntity - [0,1];
+        }else{
+            if(dir == 3){
+                myEntity @ myEntity + [1,0];
+            }else{
+                if(dir == 3){
+                    myEntity @ myEntity - [1,0];
+                }
+            }
+        }
+    }
+    
+    return myEntity;
+}
+
+
+void updateGhostPosition(){
+    i = 0;
+    while(i < ghosts.size){
+        ghosts:i = updateEntityPosition(ghosts:i, ghostdir:i);
+        
+        if(bumped){
+            ghostdir:i = ghostdir:i + 1;
+            if(ghostdir:i + 1 >= 5){
+                ghostdir:i = 1;
+            }
+        }
+    }
+}
+
+boolean updatePacmanPosition(int dir){
+    pacman = updateEntityPosition(pacman, facing);
+    i = 0;
+    while(i < ghosts.size){
+        if((pacman_x == ghosts:i_x) && (pacman_y == ghosts:i_y)){
+            if(hasCherry){
+                ghosts_rem(i);
+                score = score + 1000;
+            }else{
+                gameover = true;
+            }
+        }
+        i = i + 1;
+    }
+    
+    if((pacman_x == cherry_x) && (pacman_y == cherry_y)){
+        hasCherry = true;
+        score = score + 5000;
+        i = 0;
+        changeSprite(cherry, "noCherry.jpg");
+        while(i < ghosts.size){
+            changeSprite(ghosts:i, "blueGhost.jpg");
+        }
+    }
+}
+
+void start(){
+    ghosts_add(entity([0,0], "ghost.jpg", true));
+    ghostdir_add(1);
+    ghosts_add(entity([0,9], "ghost.jpg", true));
+    ghostdir_add(3);
+    ghosts_add(entity([9,0], "ghost.jpg", true));
+    ghostdir_add(4);
+    ghosts_add(entity([9,9], "ghost.jpg", true));
+    ghostdir_add(2);
+    
+    walls_add(entity([1,1], "wall.jpg", false));
+    walls_add(entity([2,2], "wall.jpg", false));
+    walls_add(entity([3,3], "wall.jpg", false));
+    walls_add(entity([4,4], "wall.jpg", false));
+    
+    walls_add(entity([6,6], "wall.jpg", false));
+    walls_add(entity([7,7], "wall.jpg", false));
+    walls_add(entity([8,8], "wall.jpg", false));
+    
+    walls_add(entity([1,8], "wall.jpg", false));
+    walls_add(entity([2,7], "wall.jpg", false));
+    walls_add(entity([3,6], "wall.jpg", false));
+    walls_add(entity([4,5], "wall.jpg", false));
+    
+    walls_add(entity([6,3], "wall.jpg", false));
+    walls_add(entity([7,2], "wall.jpg", false));
+    walls_add(entity([8,1], "wall.jpg", false));
+    
+    pacman = entity([5,5], "pacman.jpg", true);
+    cherry = entity([1,4], "cherry.jpg", true);
+}
+
+{
+    paused = false;
+    gameover = false;
+    won = false;
+    score = 0;
+    
+    start();
+    
+    while(gameover == false){
+        if(paused == false){
+            updateGhostPosition();
+            updatePacmanPosition();
+            if(ghosts.size == 0){
+                won = true;
+                gameover = true;
+            }
+        }
+    }
+
+}

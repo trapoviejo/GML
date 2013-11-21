@@ -830,227 +830,227 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 YY_RULE_SETUP
 #line 9 "lexico.l"
-return TRUE;
+{ printf("%s", yytext); return TRUE; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
 #line 10 "lexico.l"
-return FALSE;
+{ printf("%s", yytext); return FALSE; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
 #line 11 "lexico.l"
-return PROGRAM;
+{ printf("%s", yytext); return PROGRAM; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 12 "lexico.l"
-return VARS;
+{ printf("%s", yytext); return VARS; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 13 "lexico.l"
-return MAPSIZE;
+{ printf("%s", yytext); return MAPSIZE; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 14 "lexico.l"
-return DO;
+{ printf("%s", yytext); return DO; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 15 "lexico.l"
-return WHILE;
+{ printf("%s", yytext); return WHILE; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
 #line 16 "lexico.l"
-return IF;
+{ printf("%s", yytext); return IF; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
 #line 17 "lexico.l"
-return ELSE;
+{ printf("%s", yytext); return ELSE; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
 #line 18 "lexico.l"
-return RETURN;
+{ printf("%s", yytext); return RETURN; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
 #line 19 "lexico.l"
-return DRAW;
+{ printf("%s", yytext); return DRAW; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
 #line 20 "lexico.l"
-return VOID;
+{ printf("%s", yytext); return VOID; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
 #line 21 "lexico.l"
-return INT;
+{ printf("%s", yytext); return INT; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
 #line 22 "lexico.l"
-return FLOAT;
+{ printf("%s", yytext); return FLOAT; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
 #line 23 "lexico.l"
-return POS;
+{ printf("%s", yytext); return POS; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
 #line 24 "lexico.l"
-return BOOLEAN;
+{ printf("%s", yytext); return BOOLEAN; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 25 "lexico.l"
-return STRING;
+{ printf("%s", yytext); return STRING; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 26 "lexico.l"
-return ENTITY;
+{ printf("%s", yytext); return ENTITY; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 27 "lexico.l"
-return SPRITE;
+{ printf("%s", yytext); return SPRITE; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 28 "lexico.l"
-return ADD;
+{ printf("%s", yytext); return ADD; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 29 "lexico.l"
-return REM;
+{ printf("%s", yytext); return REM; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 30 "lexico.l"
-return LIST;
+{ printf("%s", yytext); return LIST; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 31 "lexico.l"
-return SIGN;
+{ printf("%s", yytext); return SIGN; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 32 "lexico.l"
-return AT;
+{ printf("%s", yytext); return AT; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 33 "lexico.l"
-return LEFTPARENTHESIS;
+{ printf("%s", yytext); return LEFTPARENTHESIS; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 34 "lexico.l"
-return RIGHTPARENTHESIS;
+{ printf("%s", yytext); return RIGHTPARENTHESIS; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 35 "lexico.l"
-return COLON;
+{ printf("%s", yytext); return COLON; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 36 "lexico.l"
-return SEMICOLON;
+{ printf("%s", yytext); return SEMICOLON; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
 #line 37 "lexico.l"
-return COMMA;
+{ printf("%s", yytext); return COMMA; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
 #line 38 "lexico.l"
-return LEFTBRACKET;
+{ printf("%s", yytext); return LEFTBRACKET; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
 #line 39 "lexico.l"
-return RIGHTBRACKET;
+{ printf("%s", yytext); return RIGHTBRACKET; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
 #line 41 "lexico.l"
-{ yylval.op = OP_OR;                return OR; }
+{ printf("%s", yytext); yylval.op = OP_OR;                return OR; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
 #line 42 "lexico.l"
-{ yylval.op = OP_AND;               return AND; }
+{ printf("%s", yytext); yylval.op = OP_AND;               return AND; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
 #line 43 "lexico.l"
-{ yylval.op = OP_MAYOROIGUALQUE;    return EQUALMORETHAN; }
+{ printf("%s", yytext); yylval.op = OP_MAYOROIGUALQUE;    return EQUALMORETHAN; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
 #line 44 "lexico.l"
-{ yylval.op = OP_MENOROIGUALQUE;    return EQUALLESSTHAN; }
+{ printf("%s", yytext); yylval.op = OP_MENOROIGUALQUE;    return EQUALLESSTHAN; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
 #line 45 "lexico.l"
-{ yylval.op = OP_MAYORQUE;          return MORETHAN; }
+{ printf("%s", yytext); yylval.op = OP_MAYORQUE;          return MORETHAN; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
 #line 46 "lexico.l"
-{ yylval.op = OP_MENORQUE;          return LESSTHAN; }
+{ printf("%s", yytext); yylval.op = OP_MENORQUE;          return LESSTHAN; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
 #line 47 "lexico.l"
-{ yylval.op = OP_IGUAL;             return EQUALS; }
+{ printf("%s", yytext); yylval.op = OP_IGUAL;             return EQUALS; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
 #line 48 "lexico.l"
-{ yylval.op = OP_DIFERENTE;         return NOT; }
+{ printf("%s", yytext); yylval.op = OP_DIFERENTE;         return NOT; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
 #line 49 "lexico.l"
-{ yylval.op = OP_SUMA;              return PLUS; }
+{ printf("%s", yytext); yylval.op = OP_SUMA;              return PLUS; }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
 #line 50 "lexico.l"
-{ yylval.op = OP_RESTA;             return MINUS; }
+{ printf("%s", yytext); yylval.op = OP_RESTA;             return MINUS; }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
 #line 51 "lexico.l"
-{ yylval.op = OP_MULTIPLICACION;    return MULTIPLICATION; }
+{ printf("%s", yytext); yylval.op = OP_MULTIPLICACION;    return MULTIPLICATION; }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
 #line 52 "lexico.l"
-{ yylval.op = OP_DIVISION;          return DIVISION; }
+{ printf("%s", yytext); yylval.op = OP_DIVISION;          return DIVISION; }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
 #line 53 "lexico.l"
-{ yylval.op = OP_X;                 return X; }
+{ printf("%s", yytext); yylval.op = OP_X;                 return X; }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
 #line 54 "lexico.l"
-{ yylval.op = OP_Y;                 return Y; }
+{ printf("%s", yytext); yylval.op = OP_Y;                 return Y; }
 	YY_BREAK
 case 46:
 /* rule 46 can match eol */
@@ -1061,27 +1061,27 @@ YY_RULE_SETUP
 case 47:
 YY_RULE_SETUP
 #line 57 "lexico.l"
-{ yylval.id = strdup(yytext); return ID; }
+{ printf("%s", yytext); yylval.id = strdup(yytext); return ID; }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
 #line 58 "lexico.l"
-{ return CTESTRING; }
+{ printf("%s", yytext); return CTESTRING; }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
 #line 59 "lexico.l"
-{ return CTEPOS; }
+{ printf("%s", yytext); yylval.id = strdup(yytext); return CTEPOS; }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
 #line 60 "lexico.l"
-{ yylval.id = strdup(yytext); return CTEFLOAT; }
+{ printf("%s", yytext); yylval.id = strdup(yytext); return CTEFLOAT; }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
 #line 61 "lexico.l"
-{ yylval.id = strdup(yytext); return CTEINT; }
+{ printf("%s", yytext); yylval.id = strdup(yytext); return CTEINT; }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
@@ -2087,5 +2087,6 @@ void yyfree (void * ptr )
 #define YYTABLES_NAME "yytables"
 
 #line 62 "lexico.l"
+
 
 

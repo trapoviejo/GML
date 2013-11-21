@@ -28,7 +28,7 @@
 };
 
 %type<entero> tipoovoid tipo tiposimple
-%type<id> ID CTEINT CTEFLOAT porasignar
+%type<id> ID CTEINT CTEFLOAT CTEPOS porasignar
 %type<op> PLUS MINUS MULTIPLICATION DIVISION OR AND EQUALS EQUALMORETHAN EQUALLESSTHAN NOT LESSTHAN MORETHAN X Y operadorexpresion operadorexp operadortermino operadorfactor
 
 %token ID CTESTRING CTEINT CTEFLOAT CTEPOS TRUE FALSE PROGRAM VARS
@@ -336,7 +336,7 @@ expresion:      exp
                     if(compilador.ChecaPrioridad(OP_OR)){
                         bool sePudo = compilador.GeneraCuadruplo();
                         if(!sePudo){
-                            yyerror("Incompatibilidad de tipos");
+                            yyerror("Incompatibilidad de tipos en operadores booleanos");
                             YYERROR;
                         }
                     }
@@ -362,7 +362,7 @@ exp:            termino
                     if(compilador.ChecaPrioridad(OP_SUMA)){
                         bool sePudo = compilador.GeneraCuadruplo();
                         if(!sePudo){
-                            yyerror("Incompatibilidad de tipos");
+                            yyerror("Incompatibilidad de tipos en suma o resta");
                             YYERROR;
                         }
                     }
@@ -379,7 +379,7 @@ termino:	    factor
                     if(compilador.ChecaPrioridad(OP_MULTIPLICACION)){
                         bool sePudo = compilador.GeneraCuadruplo();
                         if(!sePudo){
-                            yyerror("Incompatibilidad de tipos");
+                            yyerror("Incompatibilidad de tipos en multiplicacion o division");
                             YYERROR;
                         }
                     }
@@ -393,7 +393,21 @@ operadortermino:    MULTIPLICATION | DIVISION ;
 
 factor:		  obtenerxy factor2
 ;
-factor2:	  operadorfactor
+factor2:	operadorfactor
+            {
+                Variable op = compilador.pilaOperandos.top();
+                compilador.pilaOperandos.pop();
+                int tipo = compilador.TipoResultante($1, op.tipo, op.tipo);
+                if(tipo == TIPO_VOID){
+                    yyerror("Incompatibilidad de tipo en _x o _y");
+                    YYERROR;
+                }else{
+                    compilador.InsertaOperando("temp", tipo, GML_ES_TEMPORAL);
+                    Variable res = compilador.pilaOperandos.top();
+                    Cuadruplo quad = Cuadruplo($1, op.direccion, -1, res.direccion);
+                    compilador.vectorCuadruplos.push_back(quad);
+                }
+            }
 			| /*vacio*/
 ;
 operadorfactor: X | Y ;
@@ -416,7 +430,7 @@ varcte:	    ID
         |   CTESTRING   
         |   TRUE        
         |   FALSE       
-        |   CTEPOS
+        |   CTEPOS      { compilador.InsertaOperando($1, TIPO_POS, GML_ES_CONSTANTE); }
         |   elemento
         |   llamadafuncion
 ;
