@@ -333,9 +333,10 @@ bool Compilador::GeneraCuadruploGotof(){
     return true;
 }
 
-bool Compilador::GeneraCuadruploAsignacion(string nomVar){
-    Variable resultado = GetVar(nomVar);
+bool Compilador::GeneraCuadruploAsignacion(){
     Variable operando1 = pilaOperandos.top();
+    pilaOperandos.pop();
+    Variable resultado = pilaOperandos.top();
     pilaOperandos.pop();
     //cout << "Operando: " << operando1.nombre << ", tipo: " << operando1.tipo << endl;
     if(resultado.tipo != operando1.tipo){

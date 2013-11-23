@@ -333,9 +333,10 @@ bool Compilador::GeneraCuadruploGotof(){
     return true;
 }
 
-bool Compilador::GeneraCuadruploAsignacion(string nomVar){
-    Variable resultado = GetVar(nomVar);
+bool Compilador::GeneraCuadruploAsignacion(){
     Variable operando1 = pilaOperandos.top();
+    pilaOperandos.pop();
+    Variable resultado = pilaOperandos.top();
     pilaOperandos.pop();
     //cout << "Operando: " << operando1.nombre << ", tipo: " << operando1.tipo << endl;
     if(resultado.tipo != operando1.tipo){
@@ -516,6 +517,7 @@ bool Compilador::AccionAdd(string nomLista){
     if(EsScopeGlobal()){
         scope = 0;
     }
+    int tipo = porAgregar.tipo;
     int dirValor = (rangoMemoria[scope][0][tipo-10000]) + (tablaFuncs[funcionActual].vars[tipo-10000]);
     tablaFuncs[funcionActual].vars[tipo-10000]++;
     

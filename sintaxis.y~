@@ -27,7 +27,7 @@
   int op;
 };
 
-%type<entero> tipoovoid tipo tiposimple
+%type<entero> tipoovoid tipo tiposimple lista
 %type<id> ID CTEINT CTEFLOAT CTEPOS porasignar
 %type<op> PLUS MINUS MULTIPLICATION DIVISION OR AND EQUALS EQUALMORETHAN EQUALLESSTHAN NOT LESSTHAN MORETHAN X Y operadorexpresion operadorexp operadortermino operadorfactor
 
@@ -143,6 +143,8 @@ estatuto: asignacion|condicion|escritura|ciclowhile|ciclodowhile|regreso
 ;
 asignacion:     porasignar signo loasignado 
                 {
+                    Variable var = compilador.pilaOperandos.top();
+                    compilador.pilaOperandos.pop();
                     if(!compilador.GeneraCuadruploAsignacion($1)){
                         yyerror("No concuerdan los tipos para asignacion");
                         YYERROR;
@@ -152,11 +154,15 @@ asignacion:     porasignar signo loasignado
 
 porasignar:     ID porasignar2
                 {
-                    $$ = $1;
+                    //$$ = $1;
                     if(!compilador.ExisteVar($1)){
                         yyerror("No existe la variable utilizada");
                         YYERROR;
+                    }else{
+                        Variable var = compilador.GetVar($1);
+                        compilador.pilaOperandos.push(var);
                     }
+                    
                 }
 			|   elemento porasignar2
             ;

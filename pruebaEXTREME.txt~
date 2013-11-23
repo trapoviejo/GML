@@ -27,5 +27,5 @@ float algo(int x, float y){
     a = (([1,2] - posno)_x) / ((pacman + posno)_y);
     ghostdirs_add(1);
     ghostdirs_add(2/3);
-    ghostdirs_add(80);
+    ghostdirs_add(80.2);
 }

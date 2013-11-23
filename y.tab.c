@@ -600,16 +600,16 @@ static const yytype_uint16 yyrline[] =
       78,    81,    80,    89,    93,   101,    92,   106,   109,   110,
      114,   113,   121,   124,   125,   130,   138,   139,   139,   141,
      141,   141,   141,   141,   141,   142,   142,   142,   144,   153,
-     161,   164,   165,   166,   168,   168,   169,   169,   171,   173,
-     173,   176,   180,   175,   199,   198,   215,   214,   230,   229,
-     240,   244,   243,   259,   267,   280,   283,   280,   304,   305,
-     308,   322,   325,   326,   329,   330,   331,   332,   333,   334,
-     337,   346,   350,   349,   361,   361,   362,   365,   366,   367,
-     368,   369,   370,   371,   372,   376,   375,   387,   387,   388,
-     390,   390,   393,   392,   404,   404,   405,   407,   407,   409,
-     411,   426,   428,   428,   430,   430,   431,   432,   433,   436,
-     443,   444,   445,   446,   447,   448,   449,   450,   453,   455,
-     456,   459,   461,   462
+     165,   168,   169,   170,   172,   172,   173,   173,   175,   177,
+     177,   180,   184,   179,   203,   202,   219,   218,   234,   233,
+     244,   248,   247,   263,   271,   284,   287,   284,   308,   309,
+     312,   326,   329,   330,   333,   334,   335,   336,   337,   338,
+     341,   350,   354,   353,   365,   365,   366,   369,   370,   371,
+     372,   373,   374,   375,   376,   380,   379,   391,   391,   392,
+     394,   394,   397,   396,   408,   408,   409,   411,   411,   413,
+     415,   430,   432,   432,   434,   434,   435,   436,   437,   440,
+     447,   448,   449,   450,   451,   452,   453,   454,   457,   459,
+     460,   463,   465,   466
 };
 #endif
 
@@ -1821,7 +1821,7 @@ yyreduce:
 /* Line 1806 of yacc.c  */
 #line 145 "sintaxis.y"
     {
-                    if(!compilador.GeneraCuadruploAsignacion((yyvsp[(1) - (3)].id))){
+                    if(!compilador.GeneraCuadruploAsignacion()){
                         yyerror("No concuerdan los tipos para asignacion");
                         YYERROR;
                     }
@@ -1833,18 +1833,22 @@ yyreduce:
 /* Line 1806 of yacc.c  */
 #line 154 "sintaxis.y"
     {
-                    (yyval.id) = (yyvsp[(1) - (2)].id);
+                    //$$ = $1;
                     if(!compilador.ExisteVar((yyvsp[(1) - (2)].id))){
                         yyerror("No existe la variable utilizada");
                         YYERROR;
+                    }else{
+                        Variable var = compilador.GetVar((yyvsp[(1) - (2)].id));
+                        compilador.pilaOperandos.push(var);
                     }
+                    
                 }
     break;
 
   case 51:
 
 /* Line 1806 of yacc.c  */
-#line 176 "sintaxis.y"
+#line 180 "sintaxis.y"
     {
                     compilador.pilaSaltos.push(compilador.vectorCuadruplos.size());
                 }
@@ -1853,7 +1857,7 @@ yyreduce:
   case 52:
 
 /* Line 1806 of yacc.c  */
-#line 180 "sintaxis.y"
+#line 184 "sintaxis.y"
     {
                     if(!compilador.GeneraCuadruploGotof()){
                         yyerror("El argumento de while debe ser booleano");
@@ -1865,7 +1869,7 @@ yyreduce:
   case 53:
 
 /* Line 1806 of yacc.c  */
-#line 187 "sintaxis.y"
+#line 191 "sintaxis.y"
     {
                     int porActualizar = compilador.pilaSaltos.top();
                     compilador.pilaSaltos.pop();
@@ -1880,7 +1884,7 @@ yyreduce:
   case 54:
 
 /* Line 1806 of yacc.c  */
-#line 199 "sintaxis.y"
+#line 203 "sintaxis.y"
     {
                     compilador.pilaSaltos.push(compilador.vectorCuadruplos.size());
                 }
@@ -1889,7 +1893,7 @@ yyreduce:
   case 55:
 
 /* Line 1806 of yacc.c  */
-#line 203 "sintaxis.y"
+#line 207 "sintaxis.y"
     {
                     int inicioDoWhile = compilador.pilaSaltos.top();
                     compilador.pilaSaltos.pop();
@@ -1904,7 +1908,7 @@ yyreduce:
   case 56:
 
 /* Line 1806 of yacc.c  */
-#line 215 "sintaxis.y"
+#line 219 "sintaxis.y"
     {
                     if(!compilador.GeneraCuadruploGotof()){
                         yyerror("El argumento de if debe ser booleano");
@@ -1916,7 +1920,7 @@ yyreduce:
   case 57:
 
 /* Line 1806 of yacc.c  */
-#line 222 "sintaxis.y"
+#line 226 "sintaxis.y"
     {
                     int pendiente = compilador.pilaSaltos.top();
                     compilador.pilaSaltos.pop();
@@ -1927,7 +1931,7 @@ yyreduce:
   case 58:
 
 /* Line 1806 of yacc.c  */
-#line 230 "sintaxis.y"
+#line 234 "sintaxis.y"
     {
                     Cuadruplo quad = Cuadruplo(OP_GOTO, GML_SALTO_PENDIENTE);
                     compilador.vectorCuadruplos.push_back(quad);
@@ -1941,7 +1945,7 @@ yyreduce:
   case 61:
 
 /* Line 1806 of yacc.c  */
-#line 244 "sintaxis.y"
+#line 248 "sintaxis.y"
     {
                         //printf("Entrando a llamadafuncion\n");
                         if(!compilador.ExisteFunc((yyvsp[(1) - (2)].id)))
@@ -1960,7 +1964,7 @@ yyreduce:
   case 63:
 
 /* Line 1806 of yacc.c  */
-#line 260 "sintaxis.y"
+#line 264 "sintaxis.y"
     {
                         int tipoResultante = compilador.tablaFuncs[compilador.llamadaActual].tipo;
                         compilador.InsertaOperando("temp", tipoResultante, GML_ES_TEMPORAL);
@@ -1973,7 +1977,7 @@ yyreduce:
   case 64:
 
 /* Line 1806 of yacc.c  */
-#line 268 "sintaxis.y"
+#line 272 "sintaxis.y"
     {
                         if(compilador.paramActual != compilador.tablaFuncs[compilador.llamadaActual].params.size()){
                            yyerror("Cantidad de parametros en llamada es menor al esperado");
@@ -1990,14 +1994,14 @@ yyreduce:
   case 65:
 
 /* Line 1806 of yacc.c  */
-#line 280 "sintaxis.y"
+#line 284 "sintaxis.y"
     { compilador.PonFondoFalso(); }
     break;
 
   case 66:
 
 /* Line 1806 of yacc.c  */
-#line 283 "sintaxis.y"
+#line 287 "sintaxis.y"
     {
                         compilador.QuitaFondoFalso();                        
                         Variable operando = compilador.pilaOperandos.top();
@@ -2022,7 +2026,7 @@ yyreduce:
   case 70:
 
 /* Line 1806 of yacc.c  */
-#line 309 "sintaxis.y"
+#line 313 "sintaxis.y"
     {
                 Variable operando = compilador.pilaOperandos.top();
                 compilador.pilaOperandos.pop();
@@ -2040,70 +2044,70 @@ yyreduce:
   case 71:
 
 /* Line 1806 of yacc.c  */
-#line 322 "sintaxis.y"
+#line 326 "sintaxis.y"
     { (yyval.entero) = (yyvsp[(2) - (2)].entero); }
     break;
 
   case 72:
 
 /* Line 1806 of yacc.c  */
-#line 325 "sintaxis.y"
+#line 329 "sintaxis.y"
     { (yyval.entero) = (yyvsp[(1) - (1)].entero); compilador.subtipoListaActual = TIPO_VOID; }
     break;
 
   case 73:
 
 /* Line 1806 of yacc.c  */
-#line 326 "sintaxis.y"
+#line 330 "sintaxis.y"
     { (yyval.entero) = TIPO_LIST; compilador.subtipoListaActual = (yyvsp[(1) - (1)].entero); }
     break;
 
   case 74:
 
 /* Line 1806 of yacc.c  */
-#line 329 "sintaxis.y"
+#line 333 "sintaxis.y"
     { (yyval.entero) = TIPO_INT; }
     break;
 
   case 75:
 
 /* Line 1806 of yacc.c  */
-#line 330 "sintaxis.y"
+#line 334 "sintaxis.y"
     { (yyval.entero) = TIPO_FLOAT; }
     break;
 
   case 76:
 
 /* Line 1806 of yacc.c  */
-#line 331 "sintaxis.y"
+#line 335 "sintaxis.y"
     { (yyval.entero) = TIPO_POS; }
     break;
 
   case 77:
 
 /* Line 1806 of yacc.c  */
-#line 332 "sintaxis.y"
+#line 336 "sintaxis.y"
     { (yyval.entero) = TIPO_BOOLEAN; }
     break;
 
   case 78:
 
 /* Line 1806 of yacc.c  */
-#line 333 "sintaxis.y"
+#line 337 "sintaxis.y"
     { (yyval.entero) = TIPO_STRING; }
     break;
 
   case 79:
 
 /* Line 1806 of yacc.c  */
-#line 334 "sintaxis.y"
+#line 338 "sintaxis.y"
     { (yyval.entero) = TIPO_ENTITY; }
     break;
 
   case 80:
 
 /* Line 1806 of yacc.c  */
-#line 338 "sintaxis.y"
+#line 342 "sintaxis.y"
     {
                     bool sePudo = compilador.AccionAdd((yyvsp[(1) - (6)].id));
                     if(!sePudo){
@@ -2116,7 +2120,7 @@ yyreduce:
   case 82:
 
 /* Line 1806 of yacc.c  */
-#line 350 "sintaxis.y"
+#line 354 "sintaxis.y"
     {
                     if(compilador.ChecaPrioridad(OP_OR)){
                         bool sePudo = compilador.GeneraCuadruplo();
@@ -2131,14 +2135,14 @@ yyreduce:
   case 84:
 
 /* Line 1806 of yacc.c  */
-#line 361 "sintaxis.y"
+#line 365 "sintaxis.y"
     { compilador.InsertaOperador((yyvsp[(1) - (1)].op)); }
     break;
 
   case 95:
 
 /* Line 1806 of yacc.c  */
-#line 376 "sintaxis.y"
+#line 380 "sintaxis.y"
     {
                     if(compilador.ChecaPrioridad(OP_SUMA)){
                         bool sePudo = compilador.GeneraCuadruplo();
@@ -2153,14 +2157,14 @@ yyreduce:
   case 97:
 
 /* Line 1806 of yacc.c  */
-#line 387 "sintaxis.y"
+#line 391 "sintaxis.y"
     { compilador.InsertaOperador((yyvsp[(1) - (1)].op)); }
     break;
 
   case 102:
 
 /* Line 1806 of yacc.c  */
-#line 393 "sintaxis.y"
+#line 397 "sintaxis.y"
     {
                     if(compilador.ChecaPrioridad(OP_MULTIPLICACION)){
                         bool sePudo = compilador.GeneraCuadruplo();
@@ -2175,14 +2179,14 @@ yyreduce:
   case 104:
 
 /* Line 1806 of yacc.c  */
-#line 404 "sintaxis.y"
+#line 408 "sintaxis.y"
     { compilador.InsertaOperador((yyvsp[(1) - (1)].op)); }
     break;
 
   case 110:
 
 /* Line 1806 of yacc.c  */
-#line 412 "sintaxis.y"
+#line 416 "sintaxis.y"
     {
                 Variable op = compilador.pilaOperandos.top();
                 compilador.pilaOperandos.pop();
@@ -2202,21 +2206,21 @@ yyreduce:
   case 114:
 
 /* Line 1806 of yacc.c  */
-#line 430 "sintaxis.y"
+#line 434 "sintaxis.y"
     { compilador.PonFondoFalso(); }
     break;
 
   case 115:
 
 /* Line 1806 of yacc.c  */
-#line 430 "sintaxis.y"
+#line 434 "sintaxis.y"
     { compilador.QuitaFondoFalso(); }
     break;
 
   case 119:
 
 /* Line 1806 of yacc.c  */
-#line 437 "sintaxis.y"
+#line 441 "sintaxis.y"
     {
                 if(!compilador.InsertaOperando((yyvsp[(1) - (1)].id), 0, GML_ES_VARIABLE)){
                     yyerror("No existe la variable utilizada");
@@ -2228,28 +2232,28 @@ yyreduce:
   case 120:
 
 /* Line 1806 of yacc.c  */
-#line 443 "sintaxis.y"
+#line 447 "sintaxis.y"
     { compilador.InsertaOperando((yyvsp[(1) - (1)].id), TIPO_INT, GML_ES_CONSTANTE); }
     break;
 
   case 121:
 
 /* Line 1806 of yacc.c  */
-#line 444 "sintaxis.y"
+#line 448 "sintaxis.y"
     { compilador.InsertaOperando((yyvsp[(1) - (1)].id), TIPO_FLOAT, GML_ES_CONSTANTE); }
     break;
 
   case 125:
 
 /* Line 1806 of yacc.c  */
-#line 448 "sintaxis.y"
+#line 452 "sintaxis.y"
     { compilador.InsertaOperando((yyvsp[(1) - (1)].id), TIPO_POS, GML_ES_CONSTANTE); }
     break;
 
 
 
 /* Line 1806 of yacc.c  */
-#line 2253 "y.tab.c"
+#line 2257 "y.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2480,7 +2484,7 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 465 "sintaxis.y"
+#line 469 "sintaxis.y"
 
 
 void yyerror (char const *s){

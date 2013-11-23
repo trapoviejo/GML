@@ -143,7 +143,7 @@ estatuto: asignacion|condicion|escritura|ciclowhile|ciclodowhile|regreso
 ;
 asignacion:     porasignar signo loasignado 
                 {
-                    if(!compilador.GeneraCuadruploAsignacion($1)){
+                    if(!compilador.GeneraCuadruploAsignacion()){
                         yyerror("No concuerdan los tipos para asignacion");
                         YYERROR;
                     }
@@ -152,11 +152,15 @@ asignacion:     porasignar signo loasignado
 
 porasignar:     ID porasignar2
                 {
-                    $$ = $1;
+                    //$$ = $1;
                     if(!compilador.ExisteVar($1)){
                         yyerror("No existe la variable utilizada");
                         YYERROR;
+                    }else{
+                        Variable var = compilador.GetVar($1);
+                        compilador.pilaOperandos.push(var);
                     }
+                    
                 }
 			|   elemento porasignar2
             ;

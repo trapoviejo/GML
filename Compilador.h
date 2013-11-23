@@ -64,7 +64,7 @@ public:
     bool AccionAdd(string);
     bool GeneraCuadruplo();
     bool GeneraCuadruploGotof();
-    bool GeneraCuadruploAsignacion(string);
+    bool GeneraCuadruploAsignacion();
     unordered_map<string, Funcion> tablaFuncs;
     unordered_map<string, Variable> tablaConsts;
 };
