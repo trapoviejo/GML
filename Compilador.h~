@@ -48,6 +48,7 @@ public:
     int tipoActual;
     string llamadaActual;
     int paramActual;
+    string subtipoListaActual;
     int rangoMemoria[2][3][7];
     stack<Variable> pilaOperandos;
     stack<int> pilaOperadores;
@@ -59,7 +60,8 @@ public:
     
     ofstream cuadruplos;
     int contFunciones;
-
+    
+    bool AccionAdd(string);
     bool GeneraCuadruplo();
     bool GeneraCuadruploGotof();
     bool GeneraCuadruploAsignacion(string);

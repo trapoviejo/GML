@@ -27,7 +27,7 @@
   int op;
 };
 
-%type<entero> tipoovoid tipo tiposimple
+%type<entero> tipoovoid tipo tiposimple lista
 %type<id> ID CTEINT CTEFLOAT CTEPOS porasignar
 %type<op> PLUS MINUS MULTIPLICATION DIVISION OR AND EQUALS EQUALMORETHAN EQUALLESSTHAN NOT LESSTHAN MORETHAN X Y operadorexpresion operadorexp operadortermino operadorfactor
 
@@ -319,11 +319,11 @@ regreso:	  RETURN expresion SEMICOLON
                 }
             }
 ;
-lista:		  LIST tiposimple
+lista:		  LIST tiposimple { $$ = $2; }
 ;
 
-tipo:       tiposimple  { $$ = $1; }
-        |   lista       { $$ = TIPO_LIST; }
+tipo:       tiposimple  { $$ = $1; compilador.subtipoListaActual = TIPO_VOID; }
+        |   lista       { $$ = TIPO_LIST; compilador.subtipoListaActual = $1; }
 ;
 
 tiposimple:     INT     { $$ = TIPO_INT; }

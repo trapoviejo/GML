@@ -2037,18 +2037,25 @@ yyreduce:
             }
     break;
 
+  case 71:
+
+/* Line 1806 of yacc.c  */
+#line 322 "sintaxis.y"
+    { (yyval.entero) = (yyvsp[(2) - (2)].entero); }
+    break;
+
   case 72:
 
 /* Line 1806 of yacc.c  */
 #line 325 "sintaxis.y"
-    { (yyval.entero) = (yyvsp[(1) - (1)].entero); }
+    { (yyval.entero) = (yyvsp[(1) - (1)].entero); compilador.subtipoListaActual = TIPO_VOID; }
     break;
 
   case 73:
 
 /* Line 1806 of yacc.c  */
 #line 326 "sintaxis.y"
-    { (yyval.entero) = TIPO_LIST; }
+    { (yyval.entero) = TIPO_LIST; compilador.subtipoListaActual = (yyvsp[(1) - (1)].entero); }
     break;
 
   case 74:
@@ -2242,7 +2249,7 @@ yyreduce:
 
 
 /* Line 1806 of yacc.c  */
-#line 2246 "y.tab.c"
+#line 2253 "y.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires

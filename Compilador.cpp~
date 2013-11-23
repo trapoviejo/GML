@@ -402,7 +402,7 @@ bool Compilador::InsertaVarEnFuncActual(string nombre, int tipo, bool esParam) {
     }
     int memoriaAsignada = (rangoMemoria[scope][0][tipo-10000]) + (tablaFuncs[funcionActual].vars[tipo-10000]);
     tablaFuncs[funcionActual].vars[tipo-10000]++;
-    Variable var(nombre, tipo, memoriaAsignada);
+    Variable var(nombre, tipo, memoriaAsignada, subtipoListaActual);
     return tablaFuncs[funcionActual].InsertaVar(var, esParam);
 }
 
@@ -500,9 +500,16 @@ bool Compilador::AccionAdd(string nomLista){
     Variable porAgregar = pilaOperandos.top();
     pilaOperandos.pop();
     
+    //Obtener la dirección de la lista a la que se quiere agregar
+    Variable lista = GetVar(nomLista);
+    //Verificar que efectivamente sea tipo lista
+    if(lista.tipo != TIPO_LIST){
+        return false;
+    }
     //Chequeo de concordancia de tipo de lista con tipo de resultado
-    int tipo = porAgregar.tipo;
-    //TODO
+    if(lista.subtipo != porAgregar.tipo){
+        return false;
+    }
     
     //Obtener nueva dirección de variable del tipo del resultado en el scope actual (dirección de valor)
     int scope = 1;
@@ -523,13 +530,6 @@ bool Compilador::AccionAdd(string nomLista){
     //Generar el cuádruplo SETVAL para establecer la dirección del valor del nodo
     quad = Cuadruplo(OP_SETVAL, dirNodo, dirValor, -1);
     vectorCuadruplos.push_back(quad);
-    
-    //Obtener la dirección de la lista a la que se quiere agregar
-    Variable lista = GetVar(nomLista);
-    //Verificar que efectivamente sea tipo lista
-    if(lista.tipo != TIPO_LISTA){
-        return false;
-    }
     
     //Generar dirección temporal entera para guardar la dirección del nodo cabeza de la lista
     int dirTemp = (rangoMemoria[scope][1][TIPO_INT-10000]) + (tablaFuncs[funcionActual].temps[TIPO_INT-10000]);

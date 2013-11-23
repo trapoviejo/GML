@@ -48,6 +48,7 @@ public:
     int tipoActual;
     string llamadaActual;
     int paramActual;
+    int subtipoListaActual;
     int rangoMemoria[2][3][7];
     stack<Variable> pilaOperandos;
     stack<int> pilaOperadores;

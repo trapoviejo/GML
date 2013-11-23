@@ -319,11 +319,11 @@ regreso:	  RETURN expresion SEMICOLON
                 }
             }
 ;
-lista:		  LIST tiposimple
+lista:		  LIST tiposimple { $$ = $2; }
 ;
 
-tipo:       tiposimple  { $$ = $1; }
-        |   lista       { $$ = TIPO_LIST; }
+tipo:       tiposimple  { $$ = $1; compilador.subtipoListaActual = TIPO_VOID; }
+        |   lista       { $$ = TIPO_LIST; compilador.subtipoListaActual = $1; }
 ;
 
 tiposimple:     INT     { $$ = TIPO_INT; }
@@ -336,7 +336,7 @@ tiposimple:     INT     { $$ = TIPO_INT; }
 
 agregar:	  ID ADD LEFTPARENTHESIS expresion RIGHTPARENTHESIS SEMICOLON
               {
-                    bool sePudo = compilador.AccionAdd();
+                    bool sePudo = compilador.AccionAdd($1);
                     if(!sePudo){
                         yyerror("Error en semantica de agregar a lista");
                         YYERROR;
