@@ -28,7 +28,8 @@ enum gml_operador
     OP_PARAM = 21006,
     OP_GOSUB = 21007,
     OP_RETURN = 21008,
-    OP_GETRETURN = 21008
+    OP_GETRETURN = 21009,
+    OP_MAPSIZE = 21010
 };
 
 }
@@ -58,6 +59,7 @@ enum gml_operador
 #define OP_GOSUB 21007
 #define OP_RETURN 21008
 #define OP_GETRETURN 21009
+#define OP_MAPSIZE 21010
 
 
 #define GML_SALTO_PENDIENTE -1234

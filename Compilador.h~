@@ -58,6 +58,7 @@ public:
     Variable GetVar(string nombre);
     
     ofstream cuadruplos;
+    int contFunciones;
 
     bool GeneraCuadruplo();
     bool GeneraCuadruploGotof();

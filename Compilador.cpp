@@ -495,6 +495,61 @@ void Compilador::ImprimeCuadruplos(){
     }
 }
 
+bool Compilador::AccionAdd(string nomLista){
+    //Obtener resultado de la expresión (lo que se agrega a la lista)
+    Variable porAgregar = pilaOperandos.top();
+    pilaOperandos.pop();
+    
+    //Chequeo de concordancia de tipo de lista con tipo de resultado
+    int tipo = porAgregar.tipo;
+    //TODO
+    
+    //Obtener nueva dirección de variable del tipo del resultado en el scope actual (dirección de valor)
+    int scope = 1;
+    if(EsScopeGlobal()){
+        scope = 0;
+    }
+    int dirValor = (rangoMemoria[scope][0][tipo-10000]) + (tablaFuncs[funcionActual].vars[tipo-10000]);
+    tablaFuncs[funcionActual].vars[tipo-10000]++;
+    
+    //Generar cuádruplo de asignación
+    Cuadruplo quad = Cuadruplo(OP_ASIGNACION, porAgregar.direccion, -1, dirValor);
+    vectorCuadruplos.push_back(quad);
+    
+    //Obtener nueva dirección de variable de lista en el scope actual (dirección de nodo)
+    int dirNodo = (rangoMemoria[scope][0][TIPO_LIST-10000]) + (tablaFuncs[funcionActual].vars[TIPO_LIST-10000]);
+    tablaFuncs[funcionActual].vars[TIPO_LIST-10000]++;
+    
+    //Generar el cuádruplo SETVAL para establecer la dirección del valor del nodo
+    quad = Cuadruplo(OP_SETVAL, dirNodo, dirValor, -1);
+    vectorCuadruplos.push_back(quad);
+    
+    //Obtener la dirección de la lista a la que se quiere agregar
+    Variable lista = GetVar(nomLista);
+    //Verificar que efectivamente sea tipo lista
+    if(lista.tipo != TIPO_LIST){
+        return false;
+    }
+    
+    //Generar dirección temporal entera para guardar la dirección del nodo cabeza de la lista
+    int dirTemp = (rangoMemoria[scope][1][TIPO_INT-10000]) + (tablaFuncs[funcionActual].temps[TIPO_INT-10000]);
+    tablaFuncs[funcionActual].temps[TIPO_INT-10000]++;
+    
+    //Generar el cuádruplo GETNEXT para obtener la dirección del nodo cabeza de la lista
+    quad = Cuadruplo(OP_GETNEXT, lista.direccion, -1, dirTemp);
+    vectorCuadruplos.push_back(quad);
+
+    //Generar un cuádruplo SETNEXT para cambiar el next del nodo recién creado a la actual cabeza de la lista
+    quad = Cuadruplo(OP_SETNEXT, dirNodo, dirTemp, -1);
+    vectorCuadruplos.push_back(quad);
+    
+    //Generar un cuádruplo SETNEXT para cambiar el next del nodo cabeza de la lista al nodo recién creado
+    quad = Cuadruplo(OP_SETNEXT, lista.direccion, dirNodo, -1);
+    vectorCuadruplos.push_back(quad);
+    
+    return true;
+}
+
 Compilador compilador;
 
 int main(void){

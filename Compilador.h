@@ -59,7 +59,8 @@ public:
     
     ofstream cuadruplos;
     int contFunciones;
-
+    
+    bool AccionAdd(string);
     bool GeneraCuadruplo();
     bool GeneraCuadruploGotof();
     bool GeneraCuadruploAsignacion(string);

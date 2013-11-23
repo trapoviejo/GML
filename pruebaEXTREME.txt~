@@ -4,14 +4,14 @@ vars int: vidas, a, b;
 	 boolean: prueba;
      entity: pacman;
      pos: possi, posno;
+     list_int: ghostdirs;
 
-mapsize [256,78];
+mapsize [256,78] + [5,6];
 
 float algo(int x, float y){
     puntos = x*y + 5.0*3;
     return puntos;
 }
-
 
 {
     algo(a+b, (b-a)*1.0);
@@ -22,6 +22,10 @@ float algo(int x, float y){
     algo(123, 2.0);
     puntos = total +algo(a, 5.0);
 	total = algo(a, 5.0) + total * vidas;
-        pacman = pacman + [1,2];
-
+    pacman = pacman + [1,2];
+    vidas = possi_x + posno_y*pacman_x;
+    a = (([1,2] - posno)_x) / ((pacman + posno)_y);
+    ghostdirs_add(1);
+    ghostdirs_add(2/3);
+    ghostdirs_add(80);
 }

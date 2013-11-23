@@ -9,6 +9,7 @@ enum gmltipos {
      TIPO_BOOLEAN = 10004,
      TIPO_ENTITY = 10005,
      TIPO_LIST = 10006,
+     TIPO_POINTER = 19997,
      TIPO_VOID = 19998,
      TIPO_PROGRAMA = 19999
    };
@@ -22,6 +23,7 @@ enum gmltipos {
 #define TIPO_BOOLEAN 10004
 #define TIPO_ENTITY 10005
 #define TIPO_LIST 10006
+#define TIPO_POINTER 19997
 #define TIPO_VOID 19998
 #define TIPO_PROGRAMA 19999
 

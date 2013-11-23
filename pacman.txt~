@@ -40,7 +40,7 @@ entity updateEntityPosition(entity myEntity, int dir){
             if(dir == 3){
                 myEntity @ myEntity + [1,0];
             }else{
-                if(dir == 4){
+                if(dir == 3){
                     myEntity @ myEntity - [1,0];
                 }
             }

@@ -125,7 +125,15 @@ listaparametros:    COMMA parametros
             |   /*null*/
             ;
 
-mapa: MAPSIZE expresion SEMICOLON
+
+
+mapa:       MAPSIZE expresion SEMICOLON
+            {
+                Variable operando = compilador.pilaOperandos.top();
+                compilador.pilaOperandos.pop();
+                Cuadruplo quad = Cuadruplo(OP_MAPSIZE, operando.direccion, -1, -1);
+                compilador.vectorCuadruplos.push_back(quad);
+            }
 
 bloque: LEFTBRACKET estatuto e6 RIGHTBRACKET ;
 e6: estatuto e6 | /*null*/ ;
@@ -327,6 +335,13 @@ tiposimple:     INT     { $$ = TIPO_INT; }
 ;
 
 agregar:	  ID ADD LEFTPARENTHESIS expresion RIGHTPARENTHESIS SEMICOLON
+              {
+                    bool sePudo = compilador.AccionAdd($1);
+                    if(!sePudo){
+                        yyerror("Error en semantica de agregar a lista");
+                        YYERROR;
+                    }
+              }
 ;
 remover:	  ID REM SEMICOLON
 ;
