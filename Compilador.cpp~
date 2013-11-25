@@ -145,7 +145,7 @@ void Compilador::InicializaMemoria(){
     rangoMemoria[0][0][3] = 3000;   //string
     rangoMemoria[0][0][4] = 4000;   //boolean
     rangoMemoria[0][0][5] = 5000;   //entity
-    rangoMemoria[0][0][6] = 6000;   //list
+    rangoMemoria[0][0][6] = 6000;   //lista
 
     //Globales, temporales
     rangoMemoria[0][1][0] = 7000;   //int
@@ -192,6 +192,10 @@ void Compilador::InicializaMemoria(){
     rangoMemoria[1][2][4] = 39000;  //boolean
     rangoMemoria[1][2][5] = 40000;  //entity
     rangoMemoria[1][2][6] = 41000;  //list*/
+    
+    //POINTER
+    rangoMemoria[0][0][7] = 35000;  //global
+    rangoMemoria[1][0][7] = 36000;  //local
 }
 
 bool Compilador::EsScopeGlobal(){
@@ -280,8 +284,24 @@ bool Compilador::ChecaPrioridad(int actual){
     return true;
 }
 
+/*
 int Compilador::TipoResultante(int oper, int op1, int op2){
     return cuboSemantico[oper - 20000][op1 - 10000][op2 - 10000];
+}*/
+
+int Compilador::TipoResultante(int oper, Variable op1, Variable op2){
+    int tipo1, tipo2;    
+    if(op1.tipo == TIPO_POINTER){
+        tipo1 = op1.subtipo;
+    }else{
+        tipo1 = op1.tipo;
+    }
+    if(op2.tipo == TIPO_POINTER){
+        tipo2 = op2.subtipo;
+    }else{
+        tipo2 = op2.tipo;
+    }
+    return cuboSemantico[oper - 20000][tipo1 - 10000][tipo2 - 10000];
 }
 
 bool Compilador::GeneraCuadruplo(){
@@ -294,7 +314,7 @@ bool Compilador::GeneraCuadruplo(){
     int operador = pilaOperadores.top();
     pilaOperadores.pop();
     
-    int tipoResultante = TipoResultante(operador, operando1.tipo, operando2.tipo);
+    int tipoResultante = TipoResultante(operador, operando1, operando2);
     
     //Si el "tipo" resultante es void es que no es válida la operación para esos dos tipos de operandos
     if(tipoResultante == TIPO_VOID){
@@ -316,20 +336,24 @@ bool Compilador::GeneraCuadruplo(){
 
 bool Compilador::GeneraCuadruploGotof(){
     //Revisar semantica (debe ser booleano)
+    //cout << "Antes del top" << endl;
     Variable operando = pilaOperandos.top();
+    //cout << "Antes del pop" << endl;
     pilaOperandos.pop();
     //cout << "Operando: " << operando.nombre << ", tipo: " << operando.tipo << endl;
+    //cout << "Antes del chequeo de tipos" << endl;
     if(operando.tipo != TIPO_BOOLEAN){
         return false;
     }
-    
+    //cout << "Operando: " << operando.nombre << ", tipo: " << operando.tipo << endl;
     //Generar cuadruplo
     Cuadruplo quad = Cuadruplo(OP_GOTOF, operando.direccion, GML_SALTO_PENDIENTE);
     vectorCuadruplos.push_back(quad);
+    //cout << "Cuadruplo: " << quad.operador << " " << quad.operando1 << " " << quad.operando2 << " " << quad.resultado << endl;
     
     //Guardar direccion para actualizar salto luego
     pilaSaltos.push(vectorCuadruplos.size()-1);
-    
+    //cout << "Hice push en pila saltos" << endl;
     return true;
 }
 
@@ -339,7 +363,21 @@ bool Compilador::GeneraCuadruploAsignacion(){
     Variable resultado = pilaOperandos.top();
     pilaOperandos.pop();
     //cout << "Operando: " << operando1.nombre << ", tipo: " << operando1.tipo << endl;
-    if(resultado.tipo != operando1.tipo){
+    
+    int tipoRes, tipoOp;
+    if(resultado.tipo == TIPO_POINTER){
+        tipoRes = resultado.subtipo;
+    }else{
+        tipoRes = resultado.tipo;
+    }
+
+    if(operando1.tipo == TIPO_POINTER){
+        tipoOp = operando1.subtipo;
+    }else{
+        tipoOp = operando1.tipo;
+    }
+    
+    if(tipoRes != tipoOp){
         return false;
     }
     Cuadruplo quad = Cuadruplo(OP_ASIGNACION, operando1.direccion, resultado.direccion);
@@ -426,6 +464,7 @@ void Compilador::ImprimeTablaFuncs(bool conVars) {
     Funcion estaFunc;
     Variable estaVar;
     cout << endl << "Tabla de funciones con variables:" << endl;
+    cuadruplos << tablaFuncs.size() << endl;  //número total de funciones (incluye bloque global)
     for ( auto it = tablaFuncs.begin(); it != tablaFuncs.end(); ++it ){
         string key = it->first;
         estaFunc = tablaFuncs[key];
@@ -497,58 +536,221 @@ void Compilador::ImprimeCuadruplos(){
 }
 
 bool Compilador::AccionAdd(string nomLista){
+    //Obtener la dirección de la lista a la que se quiere agregar
+    Variable cabezaLista = GetVar(nomLista);
+    //Verificar que efectivamente sea tipo lista
+    if(cabezaLista.tipo != TIPO_LIST){
+        return false;
+    }
+    
     //Obtener resultado de la expresión (lo que se agrega a la lista)
     Variable porAgregar = pilaOperandos.top();
     pilaOperandos.pop();
-    
-    //Obtener la dirección de la lista a la que se quiere agregar
-    Variable lista = GetVar(nomLista);
-    //Verificar que efectivamente sea tipo lista
-    if(lista.tipo != TIPO_LIST){
-        return false;
-    }
     //Chequeo de concordancia de tipo de lista con tipo de resultado
-    if(lista.subtipo != porAgregar.tipo){
+    if(cabezaLista.subtipo != porAgregar.tipo){
         return false;
     }
     
-    //Obtener nueva dirección de variable del tipo del resultado en el scope actual (dirección de valor)
+    //Dame un POINTER para el contenido de la lista
     int scope = 1;
     if(EsScopeGlobal()){
         scope = 0;
     }
-    int tipo = porAgregar.tipo;
-    int dirValor = (rangoMemoria[scope][0][tipo-10000]) + (tablaFuncs[funcionActual].vars[tipo-10000]);
-    tablaFuncs[funcionActual].vars[tipo-10000]++;
-    
-    //Generar cuádruplo de asignación
-    Cuadruplo quad = Cuadruplo(OP_ASIGNACION, porAgregar.direccion, -1, dirValor);
+    int ptrValor = (rangoMemoria[scope][0][TIPO_POINTER-10000]) + (tablaFuncs[funcionActual].vars[TIPO_POINTER-10000]);
+    tablaFuncs[funcionActual].vars[TIPO_POINTER-10000]++;
+    Cuadruplo quad = Cuadruplo(OP_GETDIR, porAgregar.tipo, -1, ptrValor);
     vectorCuadruplos.push_back(quad);
     
-    //Obtener nueva dirección de variable de lista en el scope actual (dirección de nodo)
-    int dirNodo = (rangoMemoria[scope][0][TIPO_LIST-10000]) + (tablaFuncs[funcionActual].vars[TIPO_LIST-10000]);
-    tablaFuncs[funcionActual].vars[TIPO_LIST-10000]++;
+    //Asigna el resultado a la dirección apuntada por ptrValor
+    quad = Cuadruplo(OP_ASIGNACION, porAgregar.direccion, -1, ptrValor);
+    vectorCuadruplos.push_back(quad);    
+    
+    //Dame un POINTER para el nuevo nodo de la lista
+    int ptrNodo = (rangoMemoria[scope][0][TIPO_POINTER-10000]) + (tablaFuncs[funcionActual].vars[TIPO_POINTER-10000]);
+    tablaFuncs[funcionActual].vars[TIPO_POINTER-10000]++;
+    quad = Cuadruplo(OP_GETDIR, TIPO_LIST, -1, ptrNodo);
+    vectorCuadruplos.push_back(quad);
     
     //Generar el cuádruplo SETVAL para establecer la dirección del valor del nodo
-    quad = Cuadruplo(OP_SETVAL, dirNodo, dirValor, -1);
+    quad = Cuadruplo(OP_SETVAL, ptrNodo, ptrValor, -1);
     vectorCuadruplos.push_back(quad);
     
-    //Generar dirección temporal entera para guardar la dirección del nodo cabeza de la lista
-    int dirTemp = (rangoMemoria[scope][1][TIPO_INT-10000]) + (tablaFuncs[funcionActual].temps[TIPO_INT-10000]);
-    tablaFuncs[funcionActual].temps[TIPO_INT-10000]++;
-    
-    //Generar el cuádruplo GETNEXT para obtener la dirección del nodo cabeza de la lista
-    quad = Cuadruplo(OP_GETNEXT, lista.direccion, -1, dirTemp);
+    //Obtén el siguiente de la cabeza de la lista (primer elemento) y guárdalo en pointer temporal
+    int ptrTemp = (rangoMemoria[scope][0][TIPO_POINTER-10000]) + (tablaFuncs[funcionActual].vars[TIPO_POINTER-10000]);
+    tablaFuncs[funcionActual].vars[TIPO_POINTER-10000]++;
+    quad = Cuadruplo(OP_GETNEXT, cabezaLista.direccion, -1, ptrTemp);
     vectorCuadruplos.push_back(quad);
 
     //Generar un cuádruplo SETNEXT para cambiar el next del nodo recién creado a la actual cabeza de la lista
-    quad = Cuadruplo(OP_SETNEXT, dirNodo, dirTemp, -1);
+    quad = Cuadruplo(OP_SETNEXT, ptrNodo, ptrTemp, -1);
     vectorCuadruplos.push_back(quad);
     
     //Generar un cuádruplo SETNEXT para cambiar el next del nodo cabeza de la lista al nodo recién creado
-    quad = Cuadruplo(OP_SETNEXT, lista.direccion, dirNodo, -1);
+    quad = Cuadruplo(OP_SETNEXT, cabezaLista.direccion, ptrNodo, -1);
     vectorCuadruplos.push_back(quad);
     
+    return true;
+}
+
+bool Compilador::AccionElemento(string nomLista){
+    //Verificar que sea lista
+    Variable cabezaLista = GetVar(nomLista);
+    if(cabezaLista.tipo != TIPO_LIST){
+        return false;    
+    }
+    //cout << "SI es lista" << endl;
+    //Verificar que indice sea entero
+    Variable indice = pilaOperandos.top();
+    pilaOperandos.pop();
+    if(indice.tipo != TIPO_INT){
+        return false;
+    }
+    //cout << "Indice SI es INT" << endl;
+    //cout << "ya verifique tipo y lista" << endl;
+    
+    //Obtener pointer y asignar al pointer la dir de la cabeza de la lista    
+    int scope = 1;
+    if(EsScopeGlobal()){
+        scope = 0;
+    }
+    int ptrNodo = (rangoMemoria[scope][0][TIPO_POINTER-10000]) + (tablaFuncs[funcionActual].vars[TIPO_POINTER-10000]);
+    tablaFuncs[funcionActual].vars[TIPO_POINTER-10000]++;
+    Cuadruplo quad = Cuadruplo(OP_ASIGNACION, cabezaLista.direccion, -1, ptrNodo);
+    vectorCuadruplos.push_back(quad);
+
+    //Guardar número de quad siguiente
+    int dirSalto = vectorCuadruplos.size();    
+    
+    //Generar cuádruplo GETNEXT ptrNodo X ptrNodo
+    quad = Cuadruplo(OP_GETNEXT, ptrNodo, -1, ptrNodo);
+    vectorCuadruplos.push_back(quad);
+    //cout << "ya genere quad GETNEXT" << endl;
+
+    //Generar cuádruplo VERIF indice ptrNodo X
+    quad = Cuadruplo(OP_VERIF, indice.direccion, ptrNodo, -1);
+    vectorCuadruplos.push_back(quad);
+    //cout << "ya genere quad VERIFINDICE" << endl;
+    
+    //Generar cuádruplo RESTA indice 1 indice
+    InsertaConst("1", TIPO_INT);
+    Variable uno = tablaConsts["1"]; //usamos uno como constante
+    quad = Cuadruplo(OP_RESTA, indice.direccion, uno.direccion, indice.direccion);
+    vectorCuadruplos.push_back(quad);    
+
+    //Generar MAYOROIGUALQUE indice 0 tempBool
+    InsertaConst("0", TIPO_INT);
+    Variable cero = tablaConsts["0"]; //usamos cero como constante
+    int tempBool = (rangoMemoria[scope][1][TIPO_BOOLEAN-10000]) + (tablaFuncs[funcionActual].temps[TIPO_BOOLEAN-10000]);
+    tablaFuncs[funcionActual].temps[TIPO_BOOLEAN-10000]++;
+    quad = Cuadruplo(OP_MAYOROIGUALQUE, indice.direccion, cero.direccion, tempBool);
+    vectorCuadruplos.push_back(quad);     
+
+    //Generar GOTOV tempBool X (número de quad guardado)
+    quad = Cuadruplo(OP_GOTOV, tempBool, -1, dirSalto);
+    vectorCuadruplos.push_back(quad);
+
+    //Obtener pointer para que apunte al elemento
+    int ptrElem = (rangoMemoria[scope][0][TIPO_POINTER-10000]) + (tablaFuncs[funcionActual].vars[TIPO_POINTER-10000]);
+    tablaFuncs[funcionActual].vars[TIPO_POINTER-10000]++;
+    quad = Cuadruplo(OP_GETVAL, ptrNodo, -1, ptrElem);
+    vectorCuadruplos.push_back(quad); 
+    Variable elemento = Variable("ptrElementoLista", TIPO_POINTER, ptrElem, cabezaLista.subtipo);
+    pilaOperandos.push(elemento);
+    
+    return true;
+}
+
+bool Compilador::AccionEntidadPos(){
+    //Saca resultado de expresión de posición (y verifica que lo sea)
+    Variable pos = pilaOperandos.top();
+    pilaOperandos.pop();
+    //cout << "Operando: " << pos.nombre << ", tipo: " << pos.tipo << endl;
+    if(pos.tipo != TIPO_POS && !(pos.tipo == TIPO_POINTER && pos.subtipo == TIPO_POS)){
+        //cout << "NO ES POS" << endl;        
+        return false;
+    }
+    
+    //Obtenemos entidad a la que queremos asignar dicha posición
+    //PERO NO LA QUITAMOS DE LA PILA
+    Variable entidad = pilaOperandos.top();
+    //Verificamos que sea entidad
+    if(entidad.tipo != TIPO_ENTITY && !(entidad.tipo == TIPO_POINTER && entidad.subtipo == TIPO_ENTITY)){
+        //cout << "NO ES ENTITY" << endl; 
+        return false;
+    }
+    
+    //Generamos cuádruplo de asignación de pos a una entidad
+    Cuadruplo quad = Cuadruplo(OP_SETPOS, pos.direccion, -1, entidad.direccion);
+    vectorCuadruplos.push_back(quad);
+    
+    return true;
+}
+
+bool Compilador::AccionEntidadSprite(){
+    //Saca resultado de expresión de sprite (y verifica que sea string)
+    Variable sprite = pilaOperandos.top();
+    pilaOperandos.pop();
+    if(sprite.tipo != TIPO_STRING && !(sprite.tipo == TIPO_POINTER && sprite.subtipo == TIPO_STRING)){
+        return false;
+    }
+    
+    //Obtenemos entidad a la que queremos asignar dicha posición
+    //PERO NO LA QUITAMOS DE LA PILA
+    Variable entidad = pilaOperandos.top();
+    //Verificamos que sea entidad
+    if(entidad.tipo != TIPO_ENTITY && !(entidad.tipo == TIPO_POINTER && entidad.subtipo == TIPO_ENTITY)){
+        return false;
+    }
+    
+    //Generamos cuádruplo de asignación de pos a una entidad
+    Cuadruplo quad = Cuadruplo(OP_SETSPRITE, sprite.direccion, -1, entidad.direccion);
+    vectorCuadruplos.push_back(quad);
+    
+    return true;
+}
+
+bool Compilador::AccionEntidadPass(){
+    //Saca resultado de expresión de si es pasable o no (y verifica que sea boolean)
+    //cout << "Inicio de pass" << endl;
+    Variable pass = pilaOperandos.top();
+    pilaOperandos.pop();
+    if(pass.tipo != TIPO_BOOLEAN && !(pass.tipo == TIPO_POINTER && pass.subtipo == TIPO_BOOLEAN)){
+        return false;
+    }
+    //cout << "Verifique que fuera boolean, antes de sacar entity" << endl;
+    //Obtenemos entidad a la que queremos asignar dicha posición
+    //AHORA SI LA QUITAMOS DE LA PILA (es la última asignación)
+    Variable entidad = pilaOperandos.top();
+    pilaOperandos.pop();
+    //Verificamos que sea entidad
+    if(entidad.tipo != TIPO_ENTITY && !(entidad.tipo == TIPO_POINTER && entidad.subtipo == TIPO_ENTITY)){
+        return false;
+    }
+    //cout << "Verifique que fuera entity" << endl;
+    //Generamos cuádruplo de asignación de pass a una entidad
+    Cuadruplo quad = Cuadruplo(OP_SETPASS, pass.direccion, -1, entidad.direccion);
+    vectorCuadruplos.push_back(quad);
+    //cout << "Inserte quad" << endl;
+    return true;
+}
+
+bool Compilador::AccionDraw(){
+    Variable porDibujar = pilaOperandos.top();
+    pilaOperandos.pop();
+    //Sólo se pueden dibujar entidades
+    int tipo;
+    if(porDibujar.tipo == TIPO_POINTER){
+        tipo = porDibujar.subtipo;
+    }else{
+        tipo = porDibujar.tipo;
+    }
+    if(tipo != TIPO_ENTITY){
+        return false;
+    }
+    
+    //Genera cuádruplo de draw
+    Cuadruplo quad = Cuadruplo(OP_DRAW, porDibujar.direccion, -1, -1);
+    vectorCuadruplos.push_back(quad);
     return true;
 }
 

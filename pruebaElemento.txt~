@@ -1,0 +1,9 @@
+program mijuego;
+vars int: vidas, a, b;
+     list_int: ghostdirs;
+
+mapsize [256,78];
+
+{
+    a = ghostdirs:[vidas+vidas] + b;
+}

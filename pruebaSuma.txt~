@@ -1,0 +1,6 @@
+program suma;
+vars int a, b, c;
+mapsize[25,25];
+{
+    c = 4 + 5;
+}

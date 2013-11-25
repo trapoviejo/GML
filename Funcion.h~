@@ -15,6 +15,7 @@ public:
   Funcion();
   Funcion(string nombre, int tipo);
   Funcion(string, int, int);
+  Funcion(int, string, int, int);
   ~Funcion();
   bool InsertaVar(Variable);
   bool InsertaVar(Variable, bool);

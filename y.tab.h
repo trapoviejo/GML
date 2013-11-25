@@ -95,7 +95,9 @@
      SEMICOLON = 304,
      COMMA = 305,
      LEFTBRACKET = 306,
-     RIGHTBRACKET = 307
+     RIGHTBRACKET = 307,
+     LEFTSQUAREBRACKET = 308,
+     RIGHTSQUAREBRACKET = 309
    };
 #endif
 /* Tokens.  */
@@ -149,6 +151,8 @@
 #define COMMA 305
 #define LEFTBRACKET 306
 #define RIGHTBRACKET 307
+#define LEFTSQUAREBRACKET 308
+#define RIGHTSQUAREBRACKET 309
 
 
 
@@ -168,7 +172,7 @@ typedef union YYSTYPE
 
 
 /* Line 2068 of yacc.c  */
-#line 172 "y.tab.h"
+#line 176 "y.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

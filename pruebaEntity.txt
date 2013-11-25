@@ -1,0 +1,19 @@
+program mijuego;
+vars int: vidas, a, b;
+     list_int: ghostdirs;
+     string: mistring;
+     entity: pacman, esteGhost;
+     list_entity: ghosts;
+
+mapsize [256,78];
+
+{
+    pacman = entity([1,2], sprite "pacman.jpg", true);
+    mistring = "hola";
+    a = 0;
+    while(a < 5){
+        esteGhost = entity([2,3], sprite "ghost.jpg", true);
+        ghosts_add(esteGhost);
+        a = a - 1;
+    }
+}

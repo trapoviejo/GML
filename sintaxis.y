@@ -28,7 +28,7 @@
 };
 
 %type<entero> tipoovoid tipo tiposimple lista
-%type<id> ID CTEINT CTEFLOAT CTEPOS porasignar
+%type<id> ID CTEINT CTEFLOAT CTEPOS porasignar CTESTRING
 %type<op> PLUS MINUS MULTIPLICATION DIVISION OR AND EQUALS EQUALMORETHAN EQUALLESSTHAN NOT LESSTHAN MORETHAN X Y operadorexpresion operadorexp operadortermino operadorfactor
 
 %token ID CTESTRING CTEINT CTEFLOAT CTEPOS TRUE FALSE PROGRAM VARS
@@ -36,21 +36,27 @@ MAPSIZE DO WHILE IF ELSE RETURN DRAW VOID INT FLOAT POS BOOLEAN STRING
 ENTITY SPRITE ADD REM X Y LIST PLUS MINUS MULTIPLICATION DIVISION 
 SIGN AT OR AND EQUALS EQUALMORETHAN EQUALLESSTHAN NOT LESSTHAN 
 MORETHAN LEFTPARENTHESIS RIGHTPARENTHESIS COLON SEMICOLON COMMA 
-LEFTBRACKET RIGHTBRACKET
+LEFTBRACKET RIGHTBRACKET LEFTSQUAREBRACKET RIGHTSQUAREBRACKET
  
  
 %%
-programa:   PROGRAM ID
+programa:   PROGRAM ID SEMICOLON
             {
                 compilador.nomPrograma = $2;
                 compilador.InsertaFunc($2, TIPO_PROGRAMA);
+            }            
+            variables mapa
+            {
+                compilador.pilaSaltos.push(compilador.vectorCuadruplos.size());
                 Cuadruplo quad = Cuadruplo(OP_GOTO, GML_SALTO_PENDIENTE);
                 compilador.vectorCuadruplos.push_back(quad);
-            }
-            SEMICOLON variables mapa funcion
+            }            
+            funcion
             {
                 //El main empieza abajo, actualiza el goto inicial
-                compilador.vectorCuadruplos[0].resultado = compilador.vectorCuadruplos.size();
+                int gotoInicial = compilador.pilaSaltos.top();
+                compilador.pilaSaltos.pop();
+                compilador.vectorCuadruplos[gotoInicial].resultado = compilador.vectorCuadruplos.size();
                 compilador.funcionActual = compilador.nomPrograma;
             }            
             bloque
@@ -142,27 +148,9 @@ estatuto: asignacion|condicion|escritura|ciclowhile|ciclodowhile|regreso
 |llamadafuncion SEMICOLON |agregar|remover
 ;
 asignacion:     porasignar signo loasignado 
-                {
-                    if(!compilador.GeneraCuadruploAsignacion()){
-                        yyerror("No concuerdan los tipos para asignacion");
-                        YYERROR;
-                    }
-                }
 ;
 
-porasignar:     ID porasignar2
-                {
-                    //$$ = $1;
-                    if(!compilador.ExisteVar($1)){
-                        yyerror("No existe la variable utilizada");
-                        YYERROR;
-                    }else{
-                        Variable var = compilador.GetVar($1);
-                        compilador.pilaOperandos.push(var);
-                    }
-                    
-                }
-			|   elemento porasignar2
+porasignar:     asignable porasignar2
             ;
 
 porasignar2:	  X
@@ -170,25 +158,43 @@ porasignar2:	  X
 				| /*vacio*/
 ;
 signo: SIGN | AT ;
-loasignado: expresion SEMICOLON | entidad SEMICOLON
+loasignado:     expresion SEMICOLON
+                {
+                    if(!compilador.GeneraCuadruploAsignacion()){
+                        yyerror("No concuerdan los tipos para asignacion");
+                        YYERROR;
+                    }
+                }
+            |   entidad SEMICOLON //entidad se asigna dentro de esa variable sintáctica
 ;
-escritura: DRAW LEFTPARENTHESIS e9 RIGHTPARENTHESIS SEMICOLON
+escritura:  DRAW LEFTPARENTHESIS expresion RIGHTPARENTHESIS SEMICOLON
+            {
+                bool sePudo = compilador.AccionDraw();
+                if(!sePudo){
+                    yyerror("Error en semantica de dibujo (draw)");
+                    YYERROR;
+                }
+            }
 ;
-e9: entidad | ID ; 
 
 ciclowhile:     WHILE
                 {
+                    //cout << "Se pudo entrar al while!" << endl;
                     compilador.pilaSaltos.push(compilador.vectorCuadruplos.size());
+                    //cout << "Se pudo pushear a pila saltos!" << endl;
                 }                
                 LEFTPARENTHESIS expresion RIGHTPARENTHESIS
                 {
+                    //cout << "Termine parentesis del while" << endl;
                     if(!compilador.GeneraCuadruploGotof()){
                         yyerror("El argumento de while debe ser booleano");
                         YYERROR;
                     }
+                    //cout << "Generé cuádruplo GOTOF en while" << endl;
                 }
                 bloque
                 {
+                    //cout << "Terminé bloque de while" << endl;
                     int porActualizar = compilador.pilaSaltos.top();
                     compilador.pilaSaltos.pop();
                     int inicioExpresion = compilador.pilaSaltos.top();
@@ -217,10 +223,12 @@ ciclodowhile:   DO
 
 condicion:      IF LEFTPARENTHESIS expresion RIGHTPARENTHESIS
                 {
+                    //cout << "Por generar cuádruplo GOTOF en if" << endl;
                     if(!compilador.GeneraCuadruploGotof()){
                         yyerror("El argumento de if debe ser booleano");
                         YYERROR;
                     }
+                    //cout << "Generé cuádruplo GOTOF en if" << endl;
                 }
                 bloque condicionelse
                 {
@@ -246,7 +254,7 @@ condicionelse:  ELSE
 
 llamadafuncion:		  ID LEFTPARENTHESIS
                       {
-                        //printf("Entrando a llamadafuncion\n");
+                        cout << "Entrando a llamadafuncion " << $1 << endl;
                         if(!compilador.ExisteFunc($1))
                         {
                            yyerror("Llamada a funcion no declarada.");
@@ -254,18 +262,34 @@ llamadafuncion:		  ID LEFTPARENTHESIS
                         }else{
                             compilador.llamadaActual = $1;
                             compilador.paramActual = 0;
-                            Cuadruplo quad = Cuadruplo(OP_ERA, 1234, -1, -1);
+                            //cout << "Si existe func, por generar quad " << endl;
+                            int numFunc = compilador.tablaFuncs[$1].numFuncion;
+                            Cuadruplo quad = Cuadruplo(OP_ERA, numFunc, -1, -1);
                             compilador.vectorCuadruplos.push_back(quad);
+                            //cout << "Ya genere quad" << endl;
                         }
                       }
                       llamadafuncion2
                 ;
 llamadafuncion2:	  RIGHTPARENTHESIS
                     {
+                        cout << "Cerré paréntesis" << endl;
+                        if(compilador.paramActual != compilador.tablaFuncs[compilador.llamadaActual].params.size()){
+                           yyerror("Cantidad de parametros en llamada es menor al esperado");
+                           YYERROR;
+                        }
+                        cout << "Hice chequeo de cantidad de parámetros" << endl;
                         int tipoResultante = compilador.tablaFuncs[compilador.llamadaActual].tipo;
-                        compilador.InsertaOperando("temp", tipoResultante, GML_ES_TEMPORAL);
-                        Variable resultado = compilador.pilaOperandos.top(); //Solo lo vemos (para la direccion), no lo quitamos!
-                        Cuadruplo quad = Cuadruplo(OP_GOSUB, compilador.tablaFuncs[compilador.llamadaActual].direccion, -1, resultado.direccion);
+                        cout << "Obtuve tipo de tipoResultante" << endl;
+                        int dirReturn;
+                        if(tipoResultante != TIPO_VOID){
+                            compilador.InsertaOperando("temp", tipoResultante, GML_ES_TEMPORAL);
+                            Variable resultado = compilador.pilaOperandos.top(); //Solo lo vemos (para la direccion), no lo quitamos!
+                            dirReturn = resultado.tipo;
+                        }else{
+                            dirReturn = -1;
+                        }
+                        Cuadruplo quad = Cuadruplo(OP_GOSUB, compilador.tablaFuncs[compilador.llamadaActual].direccion, -1, dirReturn);
                         compilador.vectorCuadruplos.push_back(quad);
                     }
 					| paramsllamada RIGHTPARENTHESIS
@@ -275,9 +299,15 @@ llamadafuncion2:	  RIGHTPARENTHESIS
                            YYERROR;
                         }
                         int tipoResultante = compilador.tablaFuncs[compilador.llamadaActual].tipo;
-                        compilador.InsertaOperando("temp", tipoResultante, GML_ES_TEMPORAL);
-                        Variable resultado = compilador.pilaOperandos.top(); //Solo lo vemos (para la direccion), no lo quitamos!
-                        Cuadruplo quad = Cuadruplo(OP_GOSUB, compilador.tablaFuncs[compilador.llamadaActual].direccion, -1, resultado.direccion);
+                        int dirReturn;
+                        if(tipoResultante != TIPO_VOID){
+                            compilador.InsertaOperando("temp", tipoResultante, GML_ES_TEMPORAL);
+                            Variable resultado = compilador.pilaOperandos.top(); //Solo lo vemos (para la direccion), no lo quitamos!
+                            dirReturn = resultado.tipo;
+                        }else{
+                            dirReturn = -1;
+                        }
+                        Cuadruplo quad = Cuadruplo(OP_GOSUB, compilador.tablaFuncs[compilador.llamadaActual].direccion, -1, dirReturn);
                         compilador.vectorCuadruplos.push_back(quad);
                     }
 ;
@@ -294,13 +324,21 @@ paramsllamada:      { compilador.PonFondoFalso(); }
                         if(compilador.paramActual >= compilador.tablaFuncs[compilador.llamadaActual].params.size()){
                            yyerror("Cantidad de parametros en llamada es mayor al esperado");
                            YYERROR;
-                        }else if(operando.tipo != compilador.tablaFuncs[compilador.llamadaActual].params.at(compilador.paramActual)){
-                           yyerror("Tipo de parametro no concuerda");
-                           YYERROR;           
                         }else{
-                            Cuadruplo quad = Cuadruplo(OP_PARAM, operando.direccion, -1, compilador.paramActual);
-                            compilador.vectorCuadruplos.push_back(quad);
-                            compilador.paramActual++;
+                            int tipoOp;
+                            if(operando.tipo != TIPO_POINTER){
+                                tipoOp = operando.tipo;
+                            }else{
+                                tipoOp = operando.subtipo;
+                            }
+                            if(tipoOp != compilador.tablaFuncs[compilador.llamadaActual].params.at(compilador.paramActual)){
+                               yyerror("Tipo de parametro no concuerda");
+                               YYERROR;           
+                            }else{
+                                Cuadruplo quad = Cuadruplo(OP_PARAM, operando.direccion, -1, compilador.paramActual);
+                                compilador.vectorCuadruplos.push_back(quad);
+                                compilador.paramActual++;
+                            }
                         }
                     }
                     paramsllamada2
@@ -416,7 +454,7 @@ factor2:	operadorfactor
             {
                 Variable op = compilador.pilaOperandos.top();
                 compilador.pilaOperandos.pop();
-                int tipo = compilador.TipoResultante($1, op.tipo, op.tipo);
+                int tipo = compilador.TipoResultante($1, op, op);
                 if(tipo == TIPO_VOID){
                     yyerror("Incompatibilidad de tipo en _x o _y");
                     YYERROR;
@@ -437,35 +475,75 @@ obtenerxy:	  LEFTPARENTHESIS { compilador.PonFondoFalso(); } expresion RIGHTPARE
 			| varcte
 ;
 
-varcte:	    ID
-            {
-                if(!compilador.InsertaOperando($1, 0, GML_ES_VARIABLE)){
-                    yyerror("No existe la variable utilizada");
-                    YYERROR;
-                }
-            }
+varcte:	    asignable
         |   CTEINT      { compilador.InsertaOperando($1, TIPO_INT, GML_ES_CONSTANTE); }
         |   CTEFLOAT    { compilador.InsertaOperando($1, TIPO_FLOAT, GML_ES_CONSTANTE); }
-        |   CTESTRING   
-        |   TRUE        
-        |   FALSE       
+        |   CTESTRING   { compilador.InsertaOperando($1, TIPO_STRING, GML_ES_CONSTANTE); }
+        |   TRUE        { compilador.InsertaOperando("true", TIPO_BOOLEAN, GML_ES_CONSTANTE); }
+        |   FALSE       { compilador.InsertaOperando("false", TIPO_BOOLEAN, GML_ES_CONSTANTE); }
         |   CTEPOS      { compilador.InsertaOperando($1, TIPO_POS, GML_ES_CONSTANTE); }
-        |   elemento
         |   llamadafuncion
 ;
 
-elemento:	  ID COLON elemento2
-;
-elemento2:	  CTEINT
-			| ID
+asignable:      ID
+                {
+                    compilador.esElemento = false;
+                }
+                elemento
+                {
+                    if(!compilador.esElemento){
+                        //trátalo como variable
+                        if(!compilador.InsertaOperando($1, 0, GML_ES_VARIABLE)){
+                            yyerror("No existe la variable utilizada");
+                            YYERROR;
+                        }
+                    }else{
+                        //trátalo como elemento
+                        bool sePudo = compilador.AccionElemento($1);
+                        if(!sePudo){
+                            yyerror("Error en semantica de elemento de lista");
+                            YYERROR;
+                        }
+                    }
+                }
+
+elemento:	    COLON LEFTSQUAREBRACKET expresion RIGHTSQUAREBRACKET
+                {
+                    compilador.esElemento = true;
+                }
+            |   /*vacio*/
 ;
 
-entidad:	  ENTITY LEFTPARENTHESIS expresion COMMA SPRITE entidad2 
+entidad:	    ENTITY LEFTPARENTHESIS expresion
+                {
+                    //cout << "Antes de asignar pos!" << endl;
+                    bool sePudo = compilador.AccionEntidadPos();
+                    if(!sePudo){
+                        yyerror("Error en semantica de definicion de entidad - pos");
+                        YYERROR;
+                    }
+                    //cout << "Se pudo asignar pos!" << endl;
+                }
+                COMMA SPRITE expresion
+                {
+                    bool sePudo = compilador.AccionEntidadSprite();
+                    if(!sePudo){
+                        yyerror("Error en semantica de definicion de entidad - sprite");
+                        YYERROR;
+                    }
+                    //cout << "Se pudo asignar sprite!" << endl;
+                }
+                COMMA expresion RIGHTPARENTHESIS
+                {
+                    bool sePudo = compilador.AccionEntidadPass();
+                    if(!sePudo){
+                        yyerror("Error en semantica de definicion de entidad - pass");
+                        YYERROR;
+                    }
+                    //cout << "Se pudo asignar entity!" << endl;
+                }
 ;
-entidad2:	  CTESTRING COMMA expresion RIGHTPARENTHESIS
-			| ID COMMA expresion RIGHTPARENTHESIS
-;
- 
+
 %%
 
 void yyerror (char const *s){

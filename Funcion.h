@@ -25,8 +25,8 @@ public:
   int tipo;
   int numFuncion;
   int direccion;
-  int vars [7];
-  int temps [7];
+  int vars [8];
+  int temps [8];
   unordered_map<string,Variable> tablaVars;
   vector<int> params;
 };

@@ -4,7 +4,7 @@ Funcion::Funcion() {
     this->nombre = "";
 	this->tipo = TIPO_VOID;
     this->direccion = -1;
-    for (int i = 0; i < 7; i++){
+    for (int i = 0; i < 8; i++){
         this->vars[i] = 0;
         this->temps[i] = 0;
     }
@@ -15,7 +15,7 @@ Funcion::Funcion(string nombre, int tipo) {
     this->nombre = nombre;
 	this->tipo = tipo;
     this->direccion = -1;
-    for (int i = 0; i < 7; i++){
+    for (int i = 0; i < 8; i++){
         this->vars[i] = 0;
         this->temps[i] = 0;
     }
@@ -26,7 +26,7 @@ Funcion::Funcion(string nombre, int tipo, int direccion) {
     this->nombre = nombre;
 	this->tipo = tipo;
     this->direccion = direccion;
-    for (int i = 0; i < 7; i++){
+    for (int i = 0; i < 8; i++){
         this->vars[i] = 0;
         this->temps[i] = 0;
     }
@@ -37,7 +37,7 @@ Funcion::Funcion(int numFuncion, string nombre, int tipo, int direccion) {
     this->nombre = nombre;
 	this->tipo = tipo;
     this->direccion = direccion;
-    for (int i = 0; i < 7; i++){
+    for (int i = 0; i < 8; i++){
         this->vars[i] = 0;
         this->temps[i] = 0;
     }

@@ -54,12 +54,12 @@ entity updateEntityPosition(entity myEntity, int dir){
 void updateGhostPosition(){
     i = 0;
     while(i < ghosts.size){
-        ghosts:[i] = updateEntityPosition(ghosts:[i], ghostdir:[i]);
+        ghosts:i = updateEntityPosition(ghosts:i, ghostdir:i);
         
         if(bumped){
-            ghostdir:[i] = ghostdir:[i] + 1;
-            if(ghostdir:[i] + 1 >= 5){
-                ghostdir:[i] = 1;
+            ghostdir:i = ghostdir:i + 1;
+            if(ghostdir:i + 1 >= 5){
+                ghostdir:i = 1;
             }
         }
     }
@@ -69,7 +69,7 @@ boolean updatePacmanPosition(int dir){
     pacman = updateEntityPosition(pacman, facing);
     i = 0;
     while(i < ghosts.size){
-        if((pacman_x == ghosts:[i]_x) && (pacman_y == ghosts:[i]_y)){
+        if((pacman_x == ghosts:i_x) && (pacman_y == ghosts:i_y)){
             if(hasCherry){
                 ghosts_rem(i);
                 score = score + 1000;
@@ -86,7 +86,7 @@ boolean updatePacmanPosition(int dir){
         i = 0;
         changeSprite(cherry, "noCherry.jpg");
         while(i < ghosts.size){
-            changeSprite(ghosts:[i], "blueGhost.jpg");
+            changeSprite(ghosts:i, "blueGhost.jpg");
         }
     }
 }

@@ -42,14 +42,14 @@ public:
     void PonFondoFalso();
     void QuitaFondoFalso();
     bool EsScopeGlobal();
-    int TipoResultante(int oper, int op1, int op2);
+    int TipoResultante(int oper, Variable op1, Variable op2);
     string nomPrograma;
     string funcionActual;
     int tipoActual;
     string llamadaActual;
     int paramActual;
     int subtipoListaActual;
-    int rangoMemoria[2][3][7];
+    int rangoMemoria[2][3][8];
     stack<Variable> pilaOperandos;
     stack<int> pilaOperadores;
     stack<int> pilaSaltos;
@@ -58,13 +58,18 @@ public:
     bool InsertaOperando(string nombre, int tipo, int clase);
     Variable GetVar(string nombre);
     
+    bool esElemento;
     ofstream cuadruplos;
     int contFunciones;
     
     bool AccionAdd(string);
+    bool AccionElemento(string);
+    bool AccionEntidadPos();
+    bool AccionEntidadSprite();
+    bool AccionEntidadPass();
     bool GeneraCuadruplo();
     bool GeneraCuadruploGotof();
-    bool GeneraCuadruploAsignacion(string);
+    bool GeneraCuadruploAsignacion();
     unordered_map<string, Funcion> tablaFuncs;
     unordered_map<string, Variable> tablaConsts;
 };
